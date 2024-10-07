@@ -11,7 +11,7 @@ The primary goal of **Muscle-Mind** is to promote fitness and learning in a fun 
 - **Grade Reports**: Players can receive a grade report of their score for each quiz.
 
 ## How to Play
-1. Players begin by selecting a quiz category or by logging in to access their custom quizzes.
+1. Players begin by logging in to access their custom quizzes.
 2. Each question presents a set of multiple-choice questions.
 3. Incorrect answers trigger a randomized exercise penalty.
 4. After the game, players receive a performance report.
