@@ -6,7 +6,7 @@
 The primary goal of **Muscle-Mind** is to promote fitness and learning in a fun and interactive way. The game focuses on creating a healthy balance between mental and physical challenges, ensuring players not only learn more about health topics but also incorporate physical activity into the experience.
 
 ## Key Features
-- **Create Custom Quizzes**: Registered users can create and share their own quizzes, making the platform highly customizable.
+- **Create Custom Quizzes**: Registered users can create their own quizzes, making the platform highly customizable.
 - **Exercise Penalties**: Wrong answers result in a random exercise challenge, such as performing 15 squats, 10 push-ups, or a short jumping jack session.
 - **Grade Reports**: Players can receive a grade report of their score for each quiz.
 
