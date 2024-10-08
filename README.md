@@ -18,7 +18,6 @@ The primary goal of **Muscle-Mind** is to promote fitness and learning in a fun 
 
 ## Technology Stack
 - **Frontend**
-  - ReactJS
   - Redux
   - HTML/CSS
   - JavaScript
