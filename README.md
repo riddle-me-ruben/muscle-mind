@@ -18,13 +18,12 @@ The primary goal of **Muscle-Mind** is to promote fitness and learning in a fun 
 
 ## Technology Stack
 - **Frontend**
-  - Redux
   - HTML/CSS
   - JavaScript
 - **Backend**
   - Flask (Python)
 - **Database**
-  - SQLite
+  - MySQL
 - **Testing**
   - Pytest
 
