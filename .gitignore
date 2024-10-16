@@ -2,4 +2,4 @@
 .DS_Store
 
 # Ignore workspaces
-.code-workspace
+*.code-workspace
