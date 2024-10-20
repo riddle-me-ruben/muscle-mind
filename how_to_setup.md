@@ -26,4 +26,11 @@ If you are on windows, make sure you select new COMMAND PROMPT in vscode and NOT
 
 If you are on mac, open a new terminal and run `source venv/bin/activate` to activate virtual environment (make sure it says venv on left side of terminal in VSCode).
 
+Run `pip list` and make sure you have everything installed.
+
+<img src="docs/setup/pip_list.png" alt="Image" width="200">
+
 ## 4. Running the program
+Put the `.env` file I sent you on teams in the `server/` folder. This has the username and password to access the database. Don't give it out and it's okay to leave in the folder because it is ignored by git.
+
+In the terminal or command prompt, navigate to the server folder, and enter `python app.py`.

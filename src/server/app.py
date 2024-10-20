@@ -32,7 +32,7 @@ def get_db_connection():
 # Serve the HTML file without using templates
 @app.route('/')
 def index():
-    return send_file('/../client/index.html')
+    return send_file('../client/index.html')
 
 # Handle form submission
 @app.route('/add_user', methods=['POST'])
