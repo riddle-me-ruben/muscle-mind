@@ -17,6 +17,13 @@ Check to see if you have python by running `python --version` in the terminal in
 
 If you do have python, we are going to create what is called a "virtual enviornment" which is basically a fake terminal that you use whenever you need to install a bunch of libraries. This way, these libraries won't be installed on your system and if you mess something up then it won't affect it. 
 
-Create the virtual enviornment by running `python -m venv venv` <br>
+Create the virtual enviornment by running `Ctrl + Shift + P` (Windows) or `CMD + Shift + P`, then in the search menu search for Python: Select Interpreter. Click the create virtual enviornment and install the requirements.txt.<br>
 
-## 4. 
+If you are on windows, make sure you select new COMMAND PROMPT in vscode and NOT powershell and make sure you have `(.venv)` before your terminal name. If you want to deactivate type `deactivate`
+
+<img src="docs/setup/venv.png" alt="Image" width="200">
+
+
+If you are on mac, open a new terminal and run `source venv/bin/activate` to activate virtual environment (make sure it says venv on left side of terminal in VSCode).
+
+## 4. Running the program

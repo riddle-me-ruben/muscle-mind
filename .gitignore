@@ -3,6 +3,7 @@
 
 # Ignore
 .venv
+.env
 
 # Ignore workspaces
 *.code-workspace
