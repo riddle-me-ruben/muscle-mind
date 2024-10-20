@@ -24,7 +24,7 @@ If you are on windows, make sure you select new COMMAND PROMPT in vscode and NOT
 <img src="docs/setup/venv.png" alt="Image" width="200">
 
 
-If you are on mac, open a new terminal and run `source venv/bin/activate` to activate virtual environment (make sure it says venv on left side of terminal in VSCode).
+If you are on mac, open a new terminal and run `source venv/bin/activate` to activate virtual environment (MAKE SURE IT SAYS venv ON LEFT SIDE OF TERMINAL in VSCode).
 
 Run `pip list` and make sure you have everything installed.
 
@@ -33,4 +33,17 @@ Run `pip list` and make sure you have everything installed.
 ## 4. Running the program
 Put the `.env` file I sent you on teams in the `server/` folder. This has the username and password to access the database. Don't give it out and it's okay to leave in the folder because it is ignored by git.
 
-In the terminal or command prompt, navigate to the server folder, and enter `python app.py`.
+Using the terminal in vscode, navigate to the server folder `cd src/server/` and enter `python app.py`
+
+You should see this kind of output:
+<img src="docs/setup/running_app.png" alt="Image">
+
+
+Open Google Chrome and enter `127.0.0.1:5000` 
+
+If you need to quit enter `Ctrl + C` in terminal.
+
+## 5. Accessing the database
+Go to `https://www.phpmyadmin.co/` and sign in using the username and password I sent in the .env file. The server name is `sql5.freesqldatabase.com`
+
+You might need to solve a CAPTCHA. After solving that and signing in, click the little plus icon next to the database username in the top left hand corner.
