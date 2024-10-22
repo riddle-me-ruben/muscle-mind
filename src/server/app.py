@@ -1,17 +1,15 @@
-# if these libraries do not work create a virtual enviornment and run this command in the terminal:
-# pip install -r requirements.txt
 import os
 import pymysql
-from flask import Flask, request, send_file, jsonify, redirect, url_for
-from flask_mysqldb import MySQL
+from flask import Flask, request, redirect, url_for, render_template
 from dotenv import load_dotenv
 
-# Load environment variables from the .env file (you need to place this file in the same folder you made for the project)
+# Load environment variables from the .env file
 load_dotenv()
 
-app = Flask(__name__)
+# Adjust the app initialization
+app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), '../../static'), template_folder='../client')
 
-# Database configuration (make sure .env file is in the same folder as app.py)
+# Database configuration
 app.config['MYSQL_HOST'] = os.getenv('MYSQL_HOST')
 app.config['MYSQL_USER'] = os.getenv('MYSQL_USER')
 app.config['MYSQL_PASSWORD'] = os.getenv('MYSQL_PASSWORD')
@@ -29,12 +27,10 @@ def get_db_connection():
     )
     return connection
 
-# Serve the HTML file without using templates
 @app.route('/')
 def index():
-    return send_file('../client/index.html')
+    return render_template('index.html')  # Render the HTML file as a Jinja template
 
-# Handle form submission
 @app.route('/add_user', methods=['POST'])
 def add_user():
     email = request.form['email']
@@ -48,10 +44,10 @@ def add_user():
     existing_user = cursor.fetchone()
 
     if existing_user:
-        print("Email already exists")
         cursor.close()
         connection.close()
-        return redirect(url_for('index'))
+        # Return the form with an error message
+        return render_template('index.html', error2="Email already exists.")
 
     # If email does not exist, insert the new user
     cursor.execute("INSERT INTO users (email, password) VALUES (%s, %s)", (email, password))
@@ -59,7 +55,36 @@ def add_user():
     cursor.close()
     connection.close()
 
-    return send_file('index.html')  # Send the HTML file again after adding the user
+    # Return the form with a success message
+    return render_template('index.html', success2="Registration successful! You may now log in.")
+
+@app.route('/login', methods=['GET'])
+def login():
+    return render_template('login.html', error=None)
+
+@app.route('/login', methods=['POST'])
+def login_user():
+    email = request.form['email']
+    password = request.form['password']
+
+    # Check if the user exists
+    connection = get_db_connection()
+    cursor = connection.cursor()
+
+    cursor.execute("SELECT * FROM users WHERE email = %s AND password = %s", (email, password))
+    user = cursor.fetchone()
+
+    cursor.close()
+    connection.close()
+
+    if user:
+        return redirect(url_for('home'))  # Redirect to home page on successful login
+    else:
+        return render_template('login.html', error='Invalid email or password.')
+
+@app.route('/home')
+def home():
+    return render_template('home.html')  # Render the home page as a Jinja template
 
 if __name__ == '__main__':
     app.run(debug=True)
