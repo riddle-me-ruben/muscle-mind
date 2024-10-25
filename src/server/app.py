@@ -17,6 +17,8 @@ app.config['MYSQL_DB'] = os.getenv('MYSQL_DB')
 app.config['MYSQL_PORT'] = int(os.getenv('MYSQL_PORT'))
 
 # Create a connection to the database
+# @ requires working database
+# @ ensures connection is returned
 def get_db_connection():
     connection = pymysql.connect(
         host=app.config['MYSQL_HOST'],
