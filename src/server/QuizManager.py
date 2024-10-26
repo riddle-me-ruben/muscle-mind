@@ -59,40 +59,84 @@ class QuizManager:
 
         # Create a list of placeholder questions based on the number provided by the user
         questions = [f"Question {i+1}" for i in range(num_questions)]
-        return render_template('create-quiz.html', questions=questions, title=title)
+        return render_template('create-quiz.html', questions=questions, title=title, num_questions=num_questions)
 
-    # Function to handle form submission
+    # Function to handle form submission for quiz and store everything in one table
     def submit_quiz(self):
         if request.method == 'POST':
             title = request.form.get('title')
             user_email = self.session['email']  # Assuming you have user_id stored in the session
 
-            # Step 1: Insert the quiz into the 'quizzes' table
-            insert_quiz_query = "INSERT INTO quizzes (user_email, title) VALUES (%s, %s)"
-            self.db_manager.execute_commit(insert_quiz_query, (user_email, title))
-
-            # Retrieve the last inserted quiz_id
-            quiz_id = self.db_manager.get_last_insert_id()
-
-            # Count the number of questions submitted based on the 'question_text_' prefix
-            num_questions = len([key for key in request.form if key.startswith('question_text_')])
-
-            # Step 2: Insert each question into the 'questions' table
+            # Prepare to collect up to 10 questions and their options
+            questions = []
+            num_questions = 10  # Assuming max 10 questions, you can dynamically adjust this if needed
             for i in range(num_questions):
-                question_text = request.form[f'question_text_{i}']
-                answer1 = request.form[f'answer_{i}_1']
-                answer2 = request.form[f'answer_{i}_2']
-                answer3 = request.form[f'answer_{i}_3']
-                answer4 = request.form[f'answer_{i}_4']
-                correct_answer = request.form[f'correct_answer_{i}']
+                question_text = request.form.get(f'question_text_{i}', None)
+                if question_text:
+                    option1 = request.form.get(f'answer_{i}_1')
+                    option2 = request.form.get(f'answer_{i}_2')
+                    option3 = request.form.get(f'answer_{i}_3')
+                    option4 = request.form.get(f'answer_{i}_4')
+                    correct_answer = request.form.get(f'correct_answer_{i}')
+                    questions.append((question_text, option1, option2, option3, option4, correct_answer))
 
-                # Insert each question and its options into the 'questions' table
-                insert_question_query = """
-                INSERT INTO questions (quiz_id, question_text, option1, option2, option3, option4, correct_option)
-                VALUES (%s, %s, %s, %s, %s, %s, %s)
-                """
-                self.db_manager.execute_commit(insert_question_query, (
-                    quiz_id, question_text, answer1, answer2, answer3, answer4, correct_answer
-                ))
+            # Dynamically build the insert query for questions
+            columns = ['user_email', 'title']
+            values = [user_email, title]
+            query_values_placeholders = '%s, %s'
+
+            for i in range(len(questions)):
+                question_idx = i + 1
+                columns += [
+                    f'question{question_idx}', f'option{question_idx}_1', f'option{question_idx}_2', 
+                    f'option{question_idx}_3', f'option{question_idx}_4', f'correct_option{question_idx}'
+                ]
+                query_values_placeholders += ', %s, %s, %s, %s, %s, %s'
+
+                # Add values for the current question and options
+                values.extend(questions[i])
+
+            # Build the complete query
+            insert_quiz_query = f"INSERT INTO quizzes ({', '.join(columns)}) VALUES ({query_values_placeholders})"
+
+            # Execute the query to store the quiz and questions
+            self.db_manager.execute_commit(insert_quiz_query, tuple(values))
 
             return redirect(url_for('home'))
+
+
+    def get_quiz_by_id(self, quiz_id):
+        # Build the select query dynamically for all questions and their options
+        columns = ['title']
+        num_questions = 10  # Assuming max 10 questions, adjust if needed
+
+        for i in range(num_questions):
+            question_idx = i + 1
+            columns += [
+                f'question{question_idx}', f'option{question_idx}_1', f'option{question_idx}_2', 
+                f'option{question_idx}_3', f'option{question_idx}_4', f'correct_option{question_idx}'
+            ]
+
+        quiz_query = f"SELECT {', '.join(columns)} FROM quizzes WHERE quiz_id = %s"
+
+        # Execute the query to fetch the quiz and its questions
+        quiz = self.db_manager.execute_query(quiz_query, (quiz_id,))
+
+        if not quiz:
+            return None  # Return None if the quiz is not found
+
+        # Dynamically build the questions list to return
+        questions = []
+        for i in range(num_questions):
+            question_idx = 1 + i * 6  # question text index and options start from this point in the result
+            if quiz[0][question_idx]:
+                questions.append({
+                    'question': quiz[0][question_idx],
+                    'options': [quiz[0][question_idx + 1], quiz[0][question_idx + 2], quiz[0][question_idx + 3], quiz[0][question_idx + 4]],
+                    'correct_option': quiz[0][question_idx + 5]
+                })
+
+        return {
+            'title': quiz[0][0],  # The title is always the first column
+            'questions': questions
+        }
