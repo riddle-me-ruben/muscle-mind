@@ -19,13 +19,10 @@ The primary goal of **Muscle-Mind** is to promote fitness and learning in a fun 
 ## Technology Stack
 - **Frontend**
   - HTML/CSS
-  - JavaScript
 - **Backend**
   - Flask (Python)
 - **Database**
   - MySQL
-- **Testing**
-  - Pytest
 
 ## Contributions
 This project is developed as part of the Software Construction **CS 4374 course**. The game’s initial focus is on creating a robust fitness quiz platform that integrates both mental and physical challenges for a unique learning experience.
