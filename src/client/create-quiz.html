@@ -15,14 +15,22 @@
     <form method="POST" action="{{ url_for('create_quiz_route') }}">
         <label for="num_questions">How many questions do you want to create (max 10)?</label>
         <input type="number" id="num_questions" name="num_questions" min="1" max="10" required>
+
+        <label for="title">Quiz Title:</label>
+        <input type="text" id="title" name="title" placeholder="Enter quiz title" required><br><br>
+
+
         <button type="submit">Start Quiz Creation</button>
     </form>
     
 
-
     {% if questions %}
         <!-- Render the form for quiz creation -->
         <form method="POST" action="{{ url_for('submit_quiz_route') }}">
+
+            <!-- Add hidden field for title -->
+            <input type="hidden" name="title" value="{{ title }}">
+
             {% for question in questions %}
             <div class="question">
                 <label>{{ question }}</label><br>
