@@ -1,92 +1,102 @@
-import os
-import pymysql
-from flask import Flask, request, redirect, url_for, render_template
+from flask import Flask, render_template, request, redirect, url_for, session
+from DatabaseManager import DatabaseManager
+from QuizManager import QuizManager
 from dotenv import load_dotenv
+import os
 
-# Load environment variables from the .env file
+# Load environment variables
 load_dotenv()
 
-# Adjust the app initialization
-app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), '../../static'), template_folder='../client')
+def create_app():
+    # Initialize Flask app
+    app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), '../../static'), template_folder='../client')
+    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
-# Database configuration
-app.config['MYSQL_HOST'] = os.getenv('MYSQL_HOST')
-app.config['MYSQL_USER'] = os.getenv('MYSQL_USER')
-app.config['MYSQL_PASSWORD'] = os.getenv('MYSQL_PASSWORD')
-app.config['MYSQL_DB'] = os.getenv('MYSQL_DB')
-app.config['MYSQL_PORT'] = int(os.getenv('MYSQL_PORT'))
+    # Initialize the DatabaseManager instance and configure the database
+    db_manager = DatabaseManager(app)
 
-# Create a connection to the database
-# @ requires working database
-# @ ensures connection is returned
-def get_db_connection():
-    connection = pymysql.connect(
-        host=app.config['MYSQL_HOST'],
-        user=app.config['MYSQL_USER'],
-        password=app.config['MYSQL_PASSWORD'],
-        database=app.config['MYSQL_DB'],
-        port=app.config['MYSQL_PORT']
-    )
-    return connection
+    # Create an instance of the QuizManager class
+    quiz_manager = QuizManager(db_manager)
 
-@app.route('/')
-def index():
-    return render_template('index.html')  # Render the HTML file as a Jinja template
+    # Helper function to check if the user is signed in
+    def is_signed_in():
+        return 'email' in session
 
-@app.route('/add_user', methods=['POST'])
-def add_user():
-    email = request.form['email']
-    password = request.form['password']
+    # Helper function to check if a user exists in the database
+    def user_exists(email):
+        existing_user = db_manager.execute_query("SELECT * FROM users WHERE email = %s", (email,))
+        return existing_user
 
-    # Check if the email already exists
-    connection = get_db_connection()
-    cursor = connection.cursor()
+    # Define routes within the create_app function to keep state within app context
+    @app.route('/')
+    def index():
+        if is_signed_in():
+            return redirect(url_for('home'))  # Redirect if already logged in
+        
+        return render_template('index.html')  # Show login/signup options
 
-    cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
-    existing_user = cursor.fetchone()
+    @app.route('/add_user', methods=['POST'])
+    def add_user():
+        email = request.form['email']
+        password = request.form['password']
 
-    if existing_user:
-        cursor.close()
-        connection.close()
-        # Return the form with an error message
-        return render_template('index.html', error2="Email already exists.")
+        # Check if the email already exists
+        if user_exists(email):
+            return render_template('index.html', error2="Email already exists.")
 
-    # If email does not exist, insert the new user
-    cursor.execute("INSERT INTO users (email, password) VALUES (%s, %s)", (email, password))
-    connection.commit()
-    cursor.close()
-    connection.close()
+        # Insert the new user if the email does not exist
+        insert_query = "INSERT INTO users (email, password) VALUES (%s, %s)"
+        db_manager.execute_commit(insert_query, (email, password))
 
-    # Return the form with a success message
-    return render_template('index.html', success2="Registration successful! You may now log in.")
+        return render_template('index.html', success2="Registration successful! You may now log in.")
 
-@app.route('/login', methods=['GET'])
-def login():
-    return render_template('login.html', error=None)
+    @app.route('/login', methods=['GET', 'POST'])
+    def login():
+        if request.method == 'POST':
+            email = request.form['email']
+            password = request.form['password']
 
-@app.route('/login', methods=['POST'])
-def login_user():
-    email = request.form['email']
-    password = request.form['password']
+            # Verify user credentials
+            query = "SELECT * FROM users WHERE email = %s AND password = %s"
+            user = db_manager.execute_query(query, (email, password))
 
-    # Check if the user exists
-    connection = get_db_connection()
-    cursor = connection.cursor()
+            if user:
+                session['email'] = email  # Store the user's email in the session
+                return redirect(url_for('home'))
+            else:
+                return render_template('login.html', error='Invalid email or password')
 
-    cursor.execute("SELECT * FROM users WHERE email = %s AND password = %s", (email, password))
-    user = cursor.fetchone()
+        return render_template('login.html', error=None)
 
-    cursor.close()
-    connection.close()
+    @app.route('/home')
+    def home():
+        if not is_signed_in():
+            return redirect(url_for('login'))  # Redirect if not logged in
+        return render_template('home.html')  # Render home page if logged in
 
-    if user:
-        return redirect(url_for('home'))  # Redirect to home page on successful login
-    else:
-        return render_template('login.html', error='Invalid email or password.')
+    @app.route('/logout')
+    def logout():
+        session.pop('email', None)  # Remove user from session
+        return redirect(url_for('index'))
 
-@app.route('/home')
-def home():
-    return render_template('home.html')  # Render the home page as a Jinja template
+    # Route to render the quiz creation form
+    @app.route('/create-quiz', methods=['GET', 'POST'])
+    def create_quiz_route():
+        if request.method == 'POST':
+            return quiz_manager.create_quiz()
+        return render_template('create-quiz.html')  # Renders the form for number of questions
+
+
+    # Route to handle the quiz submission
+    @app.route('/submit-quiz', methods=['POST'])
+    def submit_quiz_route():
+        return quiz_manager.submit_quiz()
+
+    return app
+
+def main():
+    app = create_app()  # Call the function to initialize the app
+    app.run(debug=True)  # Start the Flask application
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    main()

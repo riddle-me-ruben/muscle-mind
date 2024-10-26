@@ -7,7 +7,16 @@
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
+
     <h1>Welcome to the Muscle Mind!</h1>
-    <p>You have successfully logged in.</p>
+
+    <a href="{{ url_for('create_quiz_route') }}">
+        <button>Create Quiz</button>
+    </a>
+
+    <a href="{{ url_for('logout') }}">
+        <button>Log Out</button>
+    </a>
+
 </body>
 </html>
