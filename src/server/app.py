@@ -110,7 +110,38 @@ def create_app():
         # Render the quiz detail page with the quiz data
         return render_template('quiz-detail.html', quiz=quiz)
 
+    @app.route('/take-quiz/<int:quiz_id>', methods=['GET'])
+    def take_quiz_route(quiz_id):
+        # Fetch the quiz details including the questions
+        quiz = quiz_manager.get_quiz_by_id(quiz_id)
+        
+        if not quiz:
+            return "Quiz not found", 404
+
+        # Render the quiz taking form
+        return render_template('take-quiz.html', quiz=quiz, quiz_id=quiz_id)
     
+    @app.route('/submit-quiz-answers/<int:quiz_id>', methods=['POST'])
+    def submit_quiz_answers_route(quiz_id):
+        # Fetch the quiz details
+        quiz = quiz_manager.get_quiz_by_id(quiz_id)
+        
+        # Get the user's answers from the form
+        user_answers = []
+        for i in range(len(quiz['questions'])):
+            user_answers.append(request.form.get(f'answer_{i}'))  # This will get 'A', 'B', 'C', or 'D'
+
+        # Compare answers and calculate score
+        score = 0
+        for i in range(len(quiz['questions'])):
+            if user_answers[i] == quiz['questions'][i]['correct_option']:
+                score += 1
+        
+        # Pass the score to the score.html template
+        return render_template('score.html', score=score, total=len(quiz['questions']))
+
+
+
     return app
 
 def main():
