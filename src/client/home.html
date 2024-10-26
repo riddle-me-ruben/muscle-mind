@@ -24,7 +24,7 @@
                 <a href="{{ url_for('quiz_detail_route', quiz_id=quiz[0]) }}">{{ quiz[1] }}</a>
 
                 <!-- Add a "Take Quiz" button that links to the take-quiz page -->
-                <a href="{{ url_for('take_quiz_route', quiz_id=quiz[0]) }}">
+                <a href="{{ url_for('take_quiz_route', quiz_id=quiz[0], question_num=0) }}">
                     <button>Take Quiz</button>
                 </a>
             </li>

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Penalty</title>
+</head>
+<body>
+
+<h1>Wrong Answer. Do 10 pushups.</h1>
+
+{% if question_num < total_questions - 1 %}
+    <!-- If there are more questions, move to the next question -->
+    <a href="{{ url_for('take_quiz_route', quiz_id=quiz_id, question_num=question_num + 1) }}">
+        <button>Go to Next Question</button>
+    </a>
+{% else %}
+    <!-- If no more questions, redirect to score page -->
+    <a href="{{ url_for('score_route', quiz_id=quiz_id, score=score, total=total_questions) }}">
+        <button>View Score</button>
+    </a>
+{% endif %}
+
+</body>
+</html>

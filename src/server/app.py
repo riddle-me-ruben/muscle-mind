@@ -110,38 +110,66 @@ def create_app():
         # Render the quiz detail page with the quiz data
         return render_template('quiz-detail.html', quiz=quiz)
 
-    @app.route('/take-quiz/<int:quiz_id>', methods=['GET'])
-    def take_quiz_route(quiz_id):
-        # Fetch the quiz details including the questions
-        quiz = quiz_manager.get_quiz_by_id(quiz_id)
-        
-        if not quiz:
-            return "Quiz not found", 404
-
-        # Render the quiz taking form
-        return render_template('take-quiz.html', quiz=quiz, quiz_id=quiz_id)
-    
-    @app.route('/submit-quiz-answers/<int:quiz_id>', methods=['POST'])
-    def submit_quiz_answers_route(quiz_id):
+    @app.route('/take-quiz/<int:quiz_id>/<int:question_num>', methods=['GET', 'POST'])
+    def take_quiz_route(quiz_id, question_num):
         # Fetch the quiz details
         quiz = quiz_manager.get_quiz_by_id(quiz_id)
+
+        # Check if the question number is valid
+        if question_num >= len(quiz['questions']):
+            return redirect(url_for('home'))  # Redirect to home if the quiz is complete
         
-        # Get the user's answers from the form
-        user_answers = []
-        for i in range(len(quiz['questions'])):
-            user_answers.append(request.form.get(f'answer_{i}'))  # This will get 'A', 'B', 'C', or 'D'
+        # Render the current question
+        return render_template('take-quiz.html', quiz=quiz, question_num=question_num, quiz_id=quiz_id)
 
-        # Compare answers and calculate score
-        score = 0
-        for i in range(len(quiz['questions'])):
-            if user_answers[i] == quiz['questions'][i]['correct_option']:
-                score += 1
-        
-        # Pass the score to the score.html template
-        return render_template('score.html', score=score, total=len(quiz['questions']))
+    @app.route('/score/<int:quiz_id>/<int:score>/<int:total>')
+    def score_route(quiz_id, score, total):
+        # Pass the score and total values to the score.html template
+        session.pop('current_score', None)
+        return render_template('score.html', score=score, total=total)
 
 
+    
+    @app.route('/submit-quiz-answer/<int:quiz_id>/<int:question_num>', methods=['POST'])
+    def submit_quiz_answer_route(quiz_id, question_num):
+        # Fetch the quiz details
+        quiz = quiz_manager.get_quiz_by_id(quiz_id)
 
+        # Get the user's answer for the current question
+        user_answer = request.form.get('answer')  # The selected answer from the form
+
+        # Check if the answer is correct
+        correct_answer = quiz['questions'][question_num]['correct_option']
+        current_score = session.get('current_score', 0)  # Track score using session
+
+        if user_answer == correct_answer:
+            # Update score in session
+            session['current_score'] = current_score + 1
+
+            # If correct, go to the next question or finish the quiz
+            if question_num + 1 < len(quiz['questions']):
+                return redirect(url_for('take_quiz_route', quiz_id=quiz_id, question_num=question_num + 1))
+            else:
+                # If no more questions, show the final score
+                total_questions = len(quiz['questions'])
+                return redirect(url_for('score_route', quiz_id=quiz_id, score=session['current_score'], total=total_questions))
+        else:
+            # If incorrect, redirect to the penalty page
+            return redirect(url_for('penalty_route', quiz_id=quiz_id, question_num=question_num))
+
+
+
+    @app.route('/penalty/<int:quiz_id>/<int:question_num>')
+    def penalty_route(quiz_id, question_num):
+        # Get the total number of questions for the quiz
+        quiz = quiz_manager.get_quiz_by_id(quiz_id)
+        total_questions = len(quiz['questions'])
+
+        # Make sure `current_score` exists in the session and has a default value
+        current_score = session.get('current_score', 0)
+
+        # Render the penalty page, passing quiz_id, question_num, total_questions, and current_score
+        return render_template('penalty.html', quiz_id=quiz_id, question_num=question_num, total_questions=total_questions, score=current_score)
     return app
 
 def main():

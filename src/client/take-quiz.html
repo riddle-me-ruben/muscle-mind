@@ -9,31 +9,29 @@
 
 <h1>{{ quiz['title'] }}</h1>
 
-<form method="POST" action="{{ url_for('submit_quiz_answers_route', quiz_id=quiz_id) }}">
-    {% for question in quiz['questions'] %}
-        <div class="question">
-            <p>{{ question['question'] }}</p>
-            <label>
-                <input type="radio" name="answer_{{ loop.index0 }}" value="A" required>
-                {{ question['options'][0] }}
-            </label><br>
-            <label>
-                <input type="radio" name="answer_{{ loop.index0 }}" value="B">
-                {{ question['options'][1] }}
-            </label><br>
-            <label>
-                <input type="radio" name="answer_{{ loop.index0 }}" value="C">
-                {{ question['options'][2] }}
-            </label><br>
-            <label>
-                <input type="radio" name="answer_{{ loop.index0 }}" value="D">
-                {{ question['options'][3] }}
-            </label><br>
-        </div>
-    {% endfor %}
-    <button type="submit">Submit Quiz</button>
-</form>
+<form method="POST" action="{{ url_for('submit_quiz_answer_route', quiz_id=quiz_id, question_num=question_num) }}">
+    <div class="question">
+        <p>{{ quiz['questions'][question_num]['question'] }}</p>
+        <label>
+            <input type="radio" name="answer" value="A" required>
+            {{ quiz['questions'][question_num]['options'][0] }}
+        </label><br>
+        <label>
+            <input type="radio" name="answer" value="B">
+            {{ quiz['questions'][question_num]['options'][1] }}
+        </label><br>
+        <label>
+            <input type="radio" name="answer" value="C">
+            {{ quiz['questions'][question_num]['options'][2] }}
+        </label><br>
+        <label>
+            <input type="radio" name="answer" value="D">
+            {{ quiz['questions'][question_num]['options'][3] }}
+        </label><br>
+    </div>
 
+    <button type="submit">Submit Answer</button>
+</form>
 
 </body>
 </html>
