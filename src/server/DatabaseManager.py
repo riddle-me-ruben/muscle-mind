@@ -56,3 +56,13 @@ class DatabaseManager:
         self.connection.commit()
         cursor.close()
         self.close()
+
+    def get_last_insert_id(self):
+        """Fetches the last inserted ID from the current connection."""
+        self.connect()
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT LAST_INSERT_ID()")
+        last_id = cursor.fetchone()[0]  # Get the first value from the result tuple
+        cursor.close()
+        self.close()
+        return last_id

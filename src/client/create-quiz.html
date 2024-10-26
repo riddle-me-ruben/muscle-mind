@@ -6,6 +6,18 @@
     <title>Create a Quiz</title>
 </head>
 <body>
+
+    <!-- Flash message section -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <ul>
+    {% for category, message in messages %}
+        <li class="{{ category }}">{{ message }}</li>
+    {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+
     <h1>Create a New Quiz</h1>
 
     <a href="{{ url_for('home') }}">

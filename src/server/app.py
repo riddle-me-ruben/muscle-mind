@@ -16,7 +16,7 @@ def create_app():
     db_manager = DatabaseManager(app)
 
     # Create an instance of the QuizManager class
-    quiz_manager = QuizManager(db_manager)
+    quiz_manager = QuizManager(db_manager, session)
 
     # Helper function to check if the user is signed in
     def is_signed_in():
