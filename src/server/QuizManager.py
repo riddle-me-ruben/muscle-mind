@@ -7,7 +7,7 @@ class QuizManager:
     # Function to render the quiz creation form based on user input for the number of questions
     def create_quiz(self):
         num_questions = request.form.get('num_questions')  # Safely get the number of questions
-        
+        title = request.form.get('title')
         if num_questions:
             num_questions = int(num_questions)
         else:
@@ -18,13 +18,15 @@ class QuizManager:
 
         # Create a list of placeholder questions based on the number provided by the user
         questions = [f"Question {i+1}" for i in range(num_questions)]
-        return render_template('create-quiz.html', questions=questions)
+        return render_template('create-quiz.html', questions=questions, title=title)
 
     # Function to handle form submission
     def submit_quiz(self):
         if request.method == 'POST':
+            title = request.form.get('title')
             # Count the number of questions submitted based on the 'question_text_' prefix
             num_questions = len([key for key in request.form if key.startswith('question_text_')])
+            print(f"Title: {title}")
 
             # Process or store the data
             for i in range(num_questions):
@@ -39,5 +41,7 @@ class QuizManager:
                 print(f"Question {i+1}: {question_text}")
                 print(f"Options: {answer1}, {answer2}, {answer3}, {answer4}")
                 print(f"Correct Answer: {correct_answer}")
+
+
 
             return redirect(url_for('home'))
