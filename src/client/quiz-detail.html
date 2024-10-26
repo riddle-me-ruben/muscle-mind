@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ quiz['quiz'][0] }} - Quiz Details</title>
+</head>
+<body>
+
+<h1>{{ quiz['quiz'][0] }}</h1>  <!-- Display the quiz title -->
+
+<!-- Display the questions and options -->
+{% for question in quiz['questions'] %}
+    <h2>{{ question[0] }}</h2>  <!-- Display the question text -->
+
+    <ul>
+        <li>A: {{ question[1] }}</li>  <!-- Option 1 -->
+        <li>B: {{ question[2] }}</li>  <!-- Option 2 -->
+        <li>C: {{ question[3] }}</li>  <!-- Option 3 -->
+        <li>D: {{ question[4] }}</li>  <!-- Option 4 -->
+    </ul>
+
+    <p>Correct Answer: {{ question[5] }}</p>  <!-- Display the correct option -->
+{% endfor %}
+
+<a href="{{ url_for('home') }}">
+    <button>Back to Home</button>
+</a>
+
+</body>
+</html>

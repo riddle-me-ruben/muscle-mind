@@ -14,6 +14,19 @@
         <button>Create Quiz</button>
     </a>
 
+    <!-- Only show the quizzes if there are any -->
+    {% if quizzes and quizzes|length > 0 %}
+    <h2>Your Quizzes:</h2>
+    <ul>
+        {% for quiz in quizzes %}
+            <li>
+                <!-- quiz[1] is now the title, and quiz[0] is the quiz_id -->
+                <a href="{{ url_for('quiz_detail_route', quiz_id=quiz[0]) }}">{{ quiz[1] }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
     <a href="{{ url_for('logout') }}">
         <button>Log Out</button>
     </a>

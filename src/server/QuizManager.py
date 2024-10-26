@@ -5,6 +5,29 @@ class QuizManager:
         self.db_manager = db_manager
         self.session = session
 
+    # Function to fetch quizzes for the logged-in user
+    def get_quiz_by_id(self, quiz_id):
+        # Query to get the quiz details
+        quiz_query = "SELECT title FROM quizzes WHERE quiz_id = %s"
+        quiz = self.db_manager.execute_query(quiz_query, (quiz_id,))
+
+        if not quiz:
+            return None  # Return None if the quiz is not found
+
+        # Query to get the quiz questions
+        question_query = """
+        SELECT question_text, option1, option2, option3, option4, correct_option
+        FROM questions WHERE quiz_id = %s
+        """
+        questions = self.db_manager.execute_query(question_query, (quiz_id,))
+        print(type(questions))
+        return {'quiz': quiz[0], 'questions': questions}
+
+    # Method to fetch quizzes for the logged-in user
+    def get_user_quizzes(self, user_email):
+        query = "SELECT quiz_id, title FROM quizzes WHERE user_email = %s"
+        quizzes = self.db_manager.execute_query(query, (user_email,))
+        return quizzes
 
     # Function to check if a user has reached the quiz creation limit
     def has_reached_quiz_limit(self, user_email):

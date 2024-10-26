@@ -72,7 +72,12 @@ def create_app():
     def home():
         if not is_signed_in():
             return redirect(url_for('login'))  # Redirect if not logged in
-        return render_template('home.html')  # Render home page if logged in
+        
+
+        user_email = session['email']  # Get the logged-in user's email
+        quizzes = quiz_manager.get_user_quizzes(user_email)  # Fetch quizzes
+
+        return render_template('home.html', quizzes=quizzes)  # Pass quizzes to the template
 
     @app.route('/logout')
     def logout():
@@ -92,6 +97,20 @@ def create_app():
     def submit_quiz_route():
         return quiz_manager.submit_quiz()
 
+
+    @app.route('/quiz/<int:quiz_id>')
+    def quiz_detail_route(quiz_id):
+        # Call the QuizManager to get the quiz details
+        quiz = quiz_manager.get_quiz_by_id(quiz_id)
+
+        # If the quiz is not found, return an error or flash a message
+        if not quiz:
+            return "Quiz not found", 404
+
+        # Render the quiz detail page with the quiz data
+        return render_template('quiz-detail.html', quiz=quiz)
+
+    
     return app
 
 def main():
