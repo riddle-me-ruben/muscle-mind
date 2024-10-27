@@ -1,15 +1,15 @@
 import unittest
 from unittest.mock import MagicMock, patch
 from flask import Flask, session, request
-from src.server.QuizCreationManager import QuizCreationManager  # Assuming class is in quiz_creation_manager.py
-from src.server.DatabaseManager import DatabaseManager  # Assuming DatabaseManager is in database_manager.py
+from src.server.QuizCreationManager import QuizCreationManager
+from src.server.DatabaseManager import DatabaseManager  
 
 class TestQuizCreationManager(unittest.TestCase):
     def setUp(self):
         self.db_manager = MagicMock(spec=DatabaseManager)
         self.quiz_manager = QuizCreationManager(self.db_manager)
         self.app = Flask(__name__)
-        self.app.secret_key = 'test_secret'  # Necessary for Flask session testing
+        self.app.secret_key = 'test_secret' 
 
     @patch('flask.request')
     @patch('flask.session')
@@ -25,7 +25,7 @@ class TestQuizCreationManager(unittest.TestCase):
     def test_create_quiz_post_with_limit(self, mock_flash, mock_request):
         mock_request.method = 'POST'
         mock_request.form = {'num_questions': '5', 'title': 'Test Quiz'}
-        self.db_manager.execute_query.return_value = [(3,)]  # Mock reaching quiz limit
+        self.db_manager.execute_query.return_value = [(3,)] 
         with self.app.app_context():
             response = self.quiz_manager.create_quiz()
             mock_flash.assert_called_with("You have reached the maximum number of quizzes allowed (3).", "error")
@@ -33,10 +33,10 @@ class TestQuizCreationManager(unittest.TestCase):
     @patch('flask.request')
     def test_limit_questions(self, mock_request):
         result = self.quiz_manager.limit_questions(12)
-        self.assertEqual(result, 10)  # Should limit to 10
+        self.assertEqual(result, 10)  
 
         result = self.quiz_manager.limit_questions(8)
-        self.assertEqual(result, 8)  # Should return 8 as it's below the limit
+        self.assertEqual(result, 8)  
 
     @patch('flask.request')
     def test_build_questions_from_form(self, mock_request):
@@ -55,7 +55,7 @@ class TestQuizCreationManager(unittest.TestCase):
 
     @patch('flask.session', {'email': 'test_user@example.com'})
     def test_has_reached_quiz_limit(self):
-        self.db_manager.execute_query.return_value = [(3,)]  # Simulate limit reached
+        self.db_manager.execute_query.return_value = [(3,)]  
         result = self.quiz_manager.has_reached_quiz_limit('test_user@example.com')
         self.assertTrue(result)
 
