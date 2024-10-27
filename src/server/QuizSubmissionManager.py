@@ -1,16 +1,37 @@
 from flask import session, request, redirect, url_for, render_template
 
 class QuizSubmissionManager:
+    """
+    Initialize the QuizSubmissionManager with a database and retrieval manager
+    db_manager: DatabaseManager - The manager responsible for database operations
+    retrieval_manager: QuizRetrievalManager - The manager responsible for quiz fetching
+    @requires A valid DatabaseManager and QuizRetrievalManager instance
+    @ensures QuizSubmissionManager is ready to handle quiz submissions and answer evaluations
+    """
     def __init__(self, db_manager, retrieval_manager):
         self.db_manager = db_manager
         self.retrieval_manager = retrieval_manager
 
+    """
+    Render the quiz question page for the given quiz and question number
+    quiz_id: int - The ID of the quiz
+    question_num: int - The current question number
+    @requires A valid quiz_id and question_num
+    @ensures The current question for the quiz is rendered
+    """
     def take_quiz(self, quiz_id, question_num):
         quiz = self.retrieval_manager.get_quiz_by_id(quiz_id)
         if question_num >= len(quiz['questions']):
             return redirect(url_for('home'))
         return render_template('take-quiz.html', quiz=quiz, question_num=question_num, quiz_id=quiz_id)
 
+    """
+    Process the answer submitted by the user for the given question
+    quiz_id: int - The ID of the quiz
+    question_num: int - The current question number
+    @requires A valid quiz_id, question_num, and answer submitted by the user
+    @ensures The answer is checked and the next question or score is displayed
+    """
     def submit_quiz_answer(self, quiz_id, question_num):
         quiz = self.retrieval_manager.get_quiz_by_id(quiz_id)
         user_answer = request.form.get('answer')
@@ -26,10 +47,25 @@ class QuizSubmissionManager:
         else:
             return redirect(url_for('penalty_route', quiz_id=quiz_id, question_num=question_num))
 
+    """
+    Render the score page after the quiz is completed
+    quiz_id: int - The ID of the quiz
+    score: int - The score achieved by the user
+    total: int - The total number of questions
+    @requires A valid quiz_id, score, and total
+    @ensures The score page is rendered showing the final result
+    """
     def score(self, quiz_id, score, total):
         session.pop('current_score', None)
         return render_template('score.html', score=score, total=total)
 
+    """
+    Render the penalty page for an incorrect answer
+    quiz_id: int - The ID of the quiz
+    question_num: int - The current question number
+    @requires A valid quiz_id and question_num
+    @ensures The penalty page is rendered showing the incorrect answer
+    """
     def penalty(self, quiz_id, question_num):
         quiz = self.retrieval_manager.get_quiz_by_id(quiz_id)
         return render_template('penalty.html', quiz_id=quiz_id, question_num=question_num, total_questions=len(quiz['questions']), score=session.get('current_score', 0))

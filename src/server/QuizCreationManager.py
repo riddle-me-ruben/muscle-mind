@@ -1,9 +1,20 @@
 from flask import request, render_template, redirect, url_for, session, flash
 
 class QuizCreationManager:
+    """
+    Initialize the QuizCreationManager with a database manager
+    db_manager: DatabaseManager - The manager responsible for database operations
+    @requires A valid DatabaseManager instance
+    @ensures QuizCreationManager is ready to handle quiz creation and submission
+    """
     def __init__(self, db_manager):
         self.db_manager = db_manager
 
+    """
+    Handle the quiz creation process and render the form for quiz creation
+    @requires A POST request with valid form data (title, num_questions) or a GET request to render the form
+    @ensures Quiz creation form is rendered or a new quiz form is displayed with dynamic fields
+    """
     def create_quiz(self):
         # Check if it's a POST request to handle form submission
         if request.method == 'POST':
@@ -36,6 +47,11 @@ class QuizCreationManager:
         # If it's a GET request, simply render the initial form (to input title and number of questions)
         return render_template('create-quiz.html')
 
+    """
+    Handle the submission of the created quiz and store it in the database
+    @requires A POST request with the filled quiz form data
+    @ensures The quiz data is inserted into the database
+    """
     def submit_quiz(self):
         if request.method == 'POST':
             title = request.form.get('title')
@@ -72,6 +88,12 @@ class QuizCreationManager:
 
             return redirect(url_for('home'))
 
+    """
+    Check if the user has reached the maximum number of quizzes allowed
+    user_email: str - The email of the user creating the quiz
+    @requires A valid user_email and database connection
+    @ensures Returns True if the user has reached the limit of 3 quizzes, else False
+    """
     def has_reached_quiz_limit(self, user_email):
         query = "SELECT COUNT(*) FROM quizzes WHERE user_email = %s"
         result = self.db_manager.execute_query(query, (user_email,))

@@ -1,9 +1,21 @@
 from flask import render_template
 
 class QuizRetrievalManager:
+    """
+    Initialize the QuizRetrievalManager with a database manager
+    db_manager: DatabaseManager - The manager responsible for database operations
+    @requires A valid DatabaseManager instance
+    @ensures QuizRetrievalManager is ready to handle quiz fetching and detail retrieval
+    """
     def __init__(self, db_manager):
         self.db_manager = db_manager
 
+    """
+    Fetch the quiz by its ID and construct the quiz data
+    quiz_id: int - The ID of the quiz
+    @requires A valid quiz_id and database connection
+    @ensures The quiz data is returned including its questions and title
+    """
     def get_quiz_by_id(self, quiz_id):
         quiz = self.fetch_quiz(quiz_id)
         if not quiz:
@@ -11,14 +23,25 @@ class QuizRetrievalManager:
         questions = self.build_questions(quiz)
         return {'title': quiz[0][0], 'questions': questions}
 
+    """
+    Retrieve quiz details from the database by its ID
+    quiz_id: int - The ID of the quiz
+    @requires A valid quiz_id and database connection
+    @ensures The quiz is fetched from the database
+    """
+    
     def fetch_quiz(self, quiz_id):
-        """Fetch quiz details and questions from the database."""
         quiz_query, params = self.build_quiz_query(quiz_id)
         quiz = self.db_manager.execute_query(quiz_query, params)
         return quiz
 
+    """
+    Build the SQL query to retrieve quiz details and questions
+    quiz_id: int - The ID of the quiz
+    @requires A valid quiz_id
+    @ensures A dynamic SQL query is built to fetch the quiz data
+    """
     def build_quiz_query(self, quiz_id):
-        """Construct the SQL query for retrieving quiz details."""
         columns = ['title']
         num_questions = 10
 
@@ -32,6 +55,12 @@ class QuizRetrievalManager:
         query = f"SELECT {', '.join(columns)} FROM quizzes WHERE quiz_id = %s"
         return query, (quiz_id,)
 
+    """
+    Build a list of questions from the fetched quiz result
+    quiz: tuple - The quiz data fetched from the database
+    @requires Valid quiz data containing questions and options
+    @ensures A list of questions with their options and correct answers is built
+    """
     def build_questions(self, quiz):
         """Build the list of questions from the quiz result."""
         num_questions = 10
@@ -53,6 +82,12 @@ class QuizRetrievalManager:
 
         return questions
 
+    """
+    Render the quiz details page with the quiz data
+    quiz_id: int - The ID of the quiz
+    @requires A valid quiz_id and QuizRetrievalManager to be initialized
+    @ensures The quiz detail page is rendered
+    """
     def quiz_detail(self, quiz_id):
         """Render the quiz detail page."""
         quiz = self.get_quiz_by_id(quiz_id)
@@ -60,6 +95,12 @@ class QuizRetrievalManager:
             return "Quiz not found", 404
         return render_template('quiz-detail.html', quiz=quiz)
 
+    """
+    Retrieve the list of quizzes created by a user
+    user_email: str - The email of the user
+    @requires A valid user_email and database connection
+    @ensures The quizzes created by the user are returned
+    """
     def get_user_quizzes(self, user_email):
         """Retrieve the quizzes created by the user."""
         query = "SELECT quiz_id, title FROM quizzes WHERE user_email = %s"
