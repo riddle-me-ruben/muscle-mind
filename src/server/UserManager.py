@@ -1,5 +1,10 @@
 from flask import render_template, request, session, redirect, url_for
 
+"""
+The UserManager class manages user-related actions such as registration, login, logout, and session handling.
+@requires A valid DatabaseManager for user-related database operations and session object for tracking user status
+@ensures Proper user management through functions like sign-in, registration, and sign-out
+"""
 class UserManager:
     """
     Initialize the UserManager with a database manager and session object

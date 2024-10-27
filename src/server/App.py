@@ -1,5 +1,3 @@
-# App.py
-
 from flask import Flask, render_template, redirect, url_for, session
 from DatabaseManager import DatabaseManager
 from QuizManager import QuizManager

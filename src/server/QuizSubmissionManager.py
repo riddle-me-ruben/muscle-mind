@@ -1,5 +1,10 @@
 from flask import session, request, redirect, url_for, render_template
 
+"""
+The QuizSubmissionManager class handles user interactions with quizzes, including submitting answers, tracking scores, and managing penalties.
+@requires A valid DatabaseManager for storing and retrieving quiz data, and a QuizRetrievalManager for fetching quiz questions
+@ensures Quizzes are properly submitted, scored, and penalties are handled for incorrect answers
+"""
 class QuizSubmissionManager:
     """
     Initialize the QuizSubmissionManager with a database and retrieval manager

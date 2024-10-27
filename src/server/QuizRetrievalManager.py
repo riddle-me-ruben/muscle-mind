@@ -1,5 +1,10 @@
 from flask import render_template
 
+"""
+The QuizRetrievalManager class handles retrieving quizzes and their details from the database.
+@requires A valid DatabaseManager for fetching quiz data
+@ensures Quiz information is retrieved and processed for display, ensuring accurate data retrieval from the database
+"""
 class QuizRetrievalManager:
     """
     Initialize the QuizRetrievalManager with a database manager

@@ -3,6 +3,11 @@ from flask import current_app
 from dotenv import load_dotenv
 import os
 
+"""
+The DatabaseManager class is responsible for managing connections and executing SQL queries on the MySQL database.
+@requires Correct configuration of database credentials and a valid MySQL connection
+@ensures Queries are executed safely and connections are managed efficiently for multiple operations
+"""
 class DatabaseManager:
     """
     Initialize the DatabaseManager and configure the database if the app is provided

@@ -1,5 +1,10 @@
 from flask import request, render_template, redirect, url_for, session, flash
 
+"""
+The QuizCreationManager class handles the quiz creation process including rendering forms, handling submissions, and storing quizzes in the database.
+@requires A valid DatabaseManager for executing SQL queries
+@ensures Quizzes are created, validated, and stored with proper user restrictions
+"""
 class QuizCreationManager:
     """
     Initialize the QuizCreationManager with a database manager

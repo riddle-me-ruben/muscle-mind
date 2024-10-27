@@ -1,3 +1,12 @@
+from QuizCreationManager import QuizCreationManager
+from QuizRetrievalManager import QuizRetrievalManager
+from QuizSubmissionManager import QuizSubmissionManager
+
+"""
+The QuizManager class acts as a controller, delegating quiz-related tasks such as creation, retrieval, and submission to the respective manager classes.
+@requires A valid DatabaseManager, session, and managers for quiz creation, retrieval, and submission
+@ensures Centralized management of quiz-related operations by coordinating between different managers
+"""
 class QuizManager:
     """
     Initialize the QuizManager and set up all the quiz-related managers
@@ -7,10 +16,6 @@ class QuizManager:
     @ensures QuizManager is ready to handle quiz creation, retrieval, and submission
     """
     def __init__(self, db_manager, session):
-        from QuizCreationManager import QuizCreationManager
-        from QuizRetrievalManager import QuizRetrievalManager
-        from QuizSubmissionManager import QuizSubmissionManager
-
         self.quiz_creation = QuizCreationManager(db_manager)
         self.quiz_retrieval = QuizRetrievalManager(db_manager)
         self.quiz_submission = QuizSubmissionManager(db_manager, self.quiz_retrieval)
