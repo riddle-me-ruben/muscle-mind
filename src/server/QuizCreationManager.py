@@ -5,24 +5,36 @@ class QuizCreationManager:
         self.db_manager = db_manager
 
     def create_quiz(self):
-        user_email = session['email']
+        # Check if it's a POST request to handle form submission
+        if request.method == 'POST':
+            user_email = session['email']
 
-        if self.has_reached_quiz_limit(user_email):
-            flash("You have reached the maximum number of quizzes allowed (3).", "error")
-            return redirect(url_for('create_quiz_route'))
+            # Check if the user has reached their quiz limit
+            if self.has_reached_quiz_limit(user_email):
+                flash("You have reached the maximum number of quizzes allowed (3).", "error")
+                return redirect(url_for('create_quiz_route'))
 
-        num_questions = request.form.get('num_questions')
-        title = request.form.get('title')
-        if num_questions:
+            # Get the number of questions and quiz title from the form
+            num_questions = request.form.get('num_questions')
+            title = request.form.get('title')
+
+            # Ensure num_questions is valid
+            if not num_questions or not title:
+                flash("Please provide both the number of questions and the quiz title.", "error")
+                return redirect(url_for('create_quiz_route'))
+
+            # Ensure num_questions is an integer
             num_questions = int(num_questions)
-        else:
-            return redirect(url_for('home'))
 
-        if num_questions > 10:
-            num_questions = 10
+            # Limit the number of questions to 10
+            if num_questions > 10:
+                num_questions = 10
 
-        questions = [f"Question {i+1}" for i in range(num_questions)]
-        return render_template('create-quiz.html', questions=questions, title=title, num_questions=num_questions)
+            # Render the second form with dynamically generated question fields
+            return render_template('create-quiz.html', num_questions=num_questions, title=title)
+
+        # If it's a GET request, simply render the initial form (to input title and number of questions)
+        return render_template('create-quiz.html')
 
     def submit_quiz(self):
         if request.method == 'POST':
