@@ -72,10 +72,5 @@ Open Google Chrome and enter `127.0.0.1:5000`
 
 If you need to quit enter `Ctrl + C` in terminal.
 
-## 5. Accessing the shared database
-Go to `https://www.phpmyadmin.co/` and sign in using the username and password I sent in the .env file. The server name is `sql5.freesqldatabase.com`
-
-You might need to solve a CAPTCHA. After solving that and signing in, click the little plus icon next to the database username in the top left hand corner.
-
 # Before Making Changes
 * Before making any changes run `git pull origin main`
