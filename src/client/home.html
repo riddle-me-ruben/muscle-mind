@@ -20,9 +20,13 @@
     <ul>
         {% for quiz in quizzes %}
         <li>
-            <div class="quiz-container">
-                <a href="{{ url_for('quiz_detail_route', quiz_id=quiz[0]) }}" class="quiz-title">{{ quiz[1] }}</a>
-            </div>
+            <!-- Make the whole quiz-container clickable -->
+            <a href="{{ url_for('take_quiz_route', quiz_id=quiz[0], question_num=0) }}" style="text-decoration: none;">
+                <div class="quiz-container">
+                    <span class="quiz-title">{{ quiz[1] }}</span>
+                </div>
+            </a>
+
         </li>
         {% endfor %}
     </ul>
