@@ -319,6 +319,7 @@ if __name__ == "__main__":
         "test_quiz_detail",
         "test_take_quiz",
         "test_submit_quiz",
+        "test_submit_quiz",
         "test_submit_quiz_answer"
     ]
 
