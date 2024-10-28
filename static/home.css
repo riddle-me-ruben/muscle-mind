@@ -1,0 +1,127 @@
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom, #f4f4f4, #4A90E2); /* Gradient from blue to light gray */
+            color: #333;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center align items */
+            justify-content: center; /* Center content vertically */
+            height: 100vh; /* Full viewport height */
+            padding: 20px;
+        }
+
+        /* Center the main heading */
+        h1 {
+            text-align: center;
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            color: #4A90E2; /* A soothing blue color */
+        }
+
+        /* Style the big button for creating quizzes */
+        .create-quiz-button {
+            background-color: #4CAF50; /* Green background */
+            color: white; /* White text */
+            border: none;
+            border-radius: 5px;
+            padding: 15px 30px; /* Larger padding for bigger button */
+            font-size: 1.5em; /* Bigger font size */
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            margin-bottom: 30px; /* Space below the button */
+            width: 100%; /* Full width */
+            max-width: 400px; /* Limit max width for large screens */
+        }
+
+        /* Change button color on hover */
+        .create-quiz-button:hover {
+            background-color: #45a049; /* Darker green */
+            transform: scale(1.05); /* Slightly enlarge */
+        }
+
+        /* Style the quizzes list */
+        ul {
+            list-style-type: none; /* Remove bullet points */
+            padding: 0;
+            width: 100%; /* Full width */
+            max-width: 600px; /* Limit max width for large screens */
+        }
+
+        .quiz-item {
+            background: white; /* White background for quiz items */
+            border-radius: 5px; /* Rounded corners */
+            padding: 15px;
+            margin: 10px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            transition: transform 0.3s;
+            cursor: pointer; /* Show pointer cursor on hover */
+            text-align: center; /* Center the quiz title */
+        }
+
+        /* Change quiz item scale on hover */
+        .quiz-item:hover {
+            transform: scale(1.12); /* Slightly enlarge */
+        }
+
+        .quiz-title {
+            font-size: 1.8em; /* Adjust the size as needed */
+            font-weight: bold; /* Make the title bold */
+            color: #333; /* Set a color for the title */
+            text-transform: uppercase; /* Make the text uppercase */
+        }        
+
+        /* Style the links */
+        a {
+            text-decoration: none; /* Remove underline from links */
+            color: inherit; /* Inherit color from parent */
+            display: block; /* Make the link block level */
+        }
+
+        /* Style the log out button */
+        .logout-button {
+            background-color: #f44336; /* Red background */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 20px; /* Space above the log out button */
+        }
+
+        /* Change log out button color on hover */
+        .logout-button:hover {
+            background-color: #d32f2f; /* Darker red */
+        }
+
+        .quiz-container {
+            background-color: #f0f0f0;  /* Light gray background */
+            border: 2px solid #ccc;      /* Border around the container */
+            border-radius: 8px;          /* Rounded corners */
+            padding: 20px;               /* Space inside the container */
+            margin: 10px 0;              /* Space between quiz containers */
+            text-align: center;          /* Center the text */
+            transition: background-color 0.3s;  /* Smooth background color transition */
+        }
+        
+        .quiz-title {
+            text-decoration: none;        /* Remove underline from links */
+            color: #333;                 /* Dark text color */
+            font-size: 1.5em;            /* Larger text */
+            font-weight: bold;           /* Make the text bold */
+            text-transform: uppercase;    /* Convert text to uppercase */
+        }
+        
+        .quiz-container:hover {
+            background-color: #4A90E2;
+            transform: scale(1.12);   /* Slightly darker on hover */
+        }
+        

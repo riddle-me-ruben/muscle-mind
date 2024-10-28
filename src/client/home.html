@@ -1,18 +1,17 @@
-<!--home.html-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/home.css">
     <title>Home</title>
-    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
 
     <h1>Welcome to the Muscle Mind!</h1>
 
     <a href="{{ url_for('create_quiz_route') }}">
-        <button>Create Quiz</button>
+        <button class="create-quiz-button">Create Quiz</button>
     </a>
 
     <!-- Only show the quizzes if there are any -->
@@ -20,21 +19,19 @@
     <h2>Your Quizzes:</h2>
     <ul>
         {% for quiz in quizzes %}
-            <li>
-                <!-- Display the quiz title and link to details -->
-                <a href="{{ url_for('quiz_detail_route', quiz_id=quiz[0]) }}">{{ quiz[1] }}</a>
-
-                <!-- Add a "Take Quiz" button that links to the take-quiz page -->
-                <a href="{{ url_for('take_quiz_route', quiz_id=quiz[0], question_num=0) }}">
-                    <button>Take Quiz</button>
-                </a>
-            </li>
+        <li>
+            <div class="quiz-container">
+                <a href="{{ url_for('quiz_detail_route', quiz_id=quiz[0]) }}" class="quiz-title">{{ quiz[1] }}</a>
+            </div>
+        </li>
         {% endfor %}
     </ul>
+    {% else %}
+    <p>No quizzes available.</p> <!-- Message if no quizzes exist -->
     {% endif %}
 
     <a href="{{ url_for('logout') }}">
-        <button>Log Out</button>
+        <button class="logout-button">Log Out</button>
     </a>
 
 </body>
