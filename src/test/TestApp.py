@@ -10,6 +10,10 @@ app = app_instance.app
 # Sample email for testing purposes
 sample_email = 'test@example.com'
 
+"""
+@requires The user is not signed in.
+@ensures The index route renders the index page.
+"""
 def test_index():
     """
     Test the index route to ensure it renders the index page when no user is signed in.
@@ -26,6 +30,10 @@ def test_index():
             print(f"Index route test failed with error: {str(e)}")
 
 
+"""
+@requires The user is either signed in or not signed in.
+@ensures The home route renders correctly based on the user's sign-in state.
+"""
 def test_home():
     """
     Test the home route to ensure it renders or redirects.
@@ -54,6 +62,10 @@ def test_home():
             print(f"Home route test failed with error: {str(e)}")
 
 
+"""
+@requires Valid user credentials (email and password).
+@ensures A new user is added to the system.
+"""
 def test_add_user():
     """
     Test the add_user route to ensure a user can be added.
@@ -71,6 +83,10 @@ def test_add_user():
             print(f"Add user route test failed with error: {str(e)}")
 
 
+"""
+@requires A valid user attempting to log in.
+@ensures The user successfully logs in.
+"""
 def test_login():
     """
     Test the login route to ensure login works correctly.
@@ -87,6 +103,10 @@ def test_login():
             print(f"Login route test failed with error: {str(e)}")
 
 
+"""
+@requires A user is logged in.
+@ensures The user is successfully logged out.
+"""
 def test_logout():
     """
     Test the logout route to ensure user is logged out.
@@ -105,6 +125,10 @@ def test_logout():
             print(f"Logout route test failed with error: {str(e)}")
 
 
+"""
+@requires A logged-in user and valid quiz data.
+@ensures A quiz is created and stored in the system.
+"""
 def test_create_quiz():
     """
     Test the create quiz route to ensure quizzes can be created.
@@ -124,6 +148,10 @@ def test_create_quiz():
             print(f"Create quiz route test failed with error: {str(e)}")
 
 
+"""
+@requires The user has completed the quiz and is submitting answers.
+@ensures The quiz submission is processed and stored.
+"""
 def test_submit_quiz():
     """
     Test the submit quiz route to ensure quizzes can be submitted.
@@ -143,6 +171,10 @@ def test_submit_quiz():
             print(f"Submit quiz route test failed with error: {str(e)}")
 
 
+"""
+@requires A valid quiz ID.
+@ensures The details of the quiz are retrieved.
+"""
 def test_quiz_detail():
     """
     Test the quiz detail route to ensure quiz details can be retrieved.
@@ -159,6 +191,10 @@ def test_quiz_detail():
             print(f"Quiz detail route test failed with error: {str(e)}")
 
 
+"""
+@requires A quiz is available and can be taken.
+@ensures The quiz is presented for the user to take.
+"""
 def test_take_quiz():
     """
     Test the take quiz route to ensure quizzes can be taken.
@@ -175,6 +211,10 @@ def test_take_quiz():
             print(f"Take quiz route test failed with error: {str(e)}")
 
 
+"""
+@requires A valid quiz and user submission data.
+@ensures The quiz answers are submitted successfully.
+"""
 def test_submit_quiz():
     """
     Test the submit quiz route to ensure quizzes can be submitted.
@@ -207,7 +247,10 @@ def test_submit_quiz():
             print(f"Submit quiz route test failed with error: {str(e)}")
 
 
-
+"""
+@requires A penalty system is in place for wrong answers.
+@ensures The penalty is applied correctly when the user submits wrong answers.
+"""
 def test_penalty():
     """
     Test the penalty route to ensure penalties are applied for wrong answers.
@@ -223,6 +266,11 @@ def test_penalty():
         except Exception as e:
             print(f"Penalty route test failed with error: {str(e)}")
 
+
+"""
+@requires A quiz is created and valid answers are submitted by the user.
+@ensures The submitted answers are processed and feedback is returned to the user.
+"""
 def test_submit_quiz_answer():
     """
     Test the submit quiz answer route to ensure quiz answers can be submitted.
@@ -256,7 +304,6 @@ def test_submit_quiz_answer():
             print("Submit quiz answer route failed (IndexError: question number is out of range)")
         except Exception as e:
             print(f"Submit quiz answer route test failed with error: {str(e)}")
-
 
 
 if __name__ == "__main__":
