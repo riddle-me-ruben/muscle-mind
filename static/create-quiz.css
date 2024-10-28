@@ -1,108 +1,101 @@
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-        body {
-            font-family: Arial, sans-serif;
-            background: #4A90E2; /* Gradient from purple to blue */
-            color: #333;
-            line-height: 1.6;
-            display: flex;
-            flex-direction: column;
-            align-items: center; /* Center align items */
-            justify-content: flex-start; /* Align items at the top */
-            height: 100vh; /* Full viewport height */
-            padding: 20px;
-            font-size: 1em; /* Base font size set to 2em */
-        }
+body {
+    font-family: Arial, sans-serif;
+    background: #4A90E2;
+    color: #333;
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    height: 100vh;
+    padding: 20px;
+    font-size: 2em;
+}
 
-        /* Flash message styling */
-        ul {
-            list-style-type: none;
-            padding: 0;
-            margin-bottom: 20px;
-            width: 100%;
-            max-width: 600px;
-        }
+ul {
+    list-style-type: none;
+    padding: 0;
+    margin-bottom: 20px;
+    width: 100%;
+    max-width: 600px;
+}
 
-        li {
-            padding: 10px;
-            margin: 5px 0;
-            border-radius: 5px;
-            color: white; /* White text for messages */
-        }
+li {
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+    color: white;
+}
 
-        .success {
-            background-color: #4CAF50; /* Green */
-        }
+.success {
+    background-color: #4CAF50;
+}
 
-        .error {
-            background-color: #f44336; /* Red */
-        }
+.error {
+    background-color: red;
+}
 
-        /* Center the main heading */
-        h1 {
-            text-align: center;
-            font-size: 3em; /* Increased font size for the title */
-            margin-bottom: 20px;
-            color: black; /* White color for the title */
-        }
+h1 {
+    text-align: center;
+    font-size: 3em;
+    margin-bottom: 20px;
+    color: black;
+}
 
-        /* Style the buttons */
-        button {
-            background-color: #4CAF50; /* Green background */
-            color: white; /* White text */
-            border: none;
-            border-radius: 5px;
-            padding: 15px 30px; /* Larger padding for bigger button */
-            font-size: 2em; /* Increased font size for buttons */
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.3s;
-            margin: 20px 0; /* Space around buttons */
-        }
+button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 15px 30px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+    margin: 20px 0;
+}
 
-        /* Change button color on hover */
-        button:hover {
-            background-color: #45a049; /* Darker green */
-            transform: scale(1.05); /* Slightly enlarge */
-        }
+button:hover {
+    background-color: #45a049;
+    transform: scale(1.05);
+}
 
-        /* Style the form */
-        form {
-            background: white; /* White background for the form */
-            border-radius: 5px; /* Rounded corners */
-            padding: 20px;
-            width: 100%; /* Full width */
-            max-width: 600px; /* Limit max width for large screens */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Shadow effect */
-        }
+form {
+    background: white;
+    border-radius: 5px;
+    padding: 20px;
+    width: 100%;
+    max-width: 600px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
 
-        label {
-            font-weight: bold; /* Bold labels */
-            margin-top: 10px; /* Space above labels */
-            display: block; /* Block level for labels */
-            font-size: 1.5em; /* Increased font size for labels */
-        }
+label {
+    font-weight: bold;
+    margin-top: 10px;
+    display: block;
+    font-size: 1.2em;
+}
 
-        input[type="text"],
-        input[type="number"],
-        input[type="radio"] {
-            width: calc(100% - 20px); /* Full width minus padding */
-            padding: 10px; /* Padding for inputs */
-            margin: 5px 0; /* Space around inputs */
-            border: 1px solid #ddd; /* Light gray border */
-            border-radius: 5px; /* Rounded corners */
-            font-size: 1.5em; /* Increased font size for inputs */
-        }
+input[type="text"],
+input[type="number"],
+input[type="radio"] {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin: 5px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1.2em;
+}
 
-        /* Style for radio buttons */
-        input[type="radio"] {
-            width: auto; /* Keep radio buttons at auto width */
-        }
+input[type="radio"] {
+    width: auto;
+}
 
-        /* Style for questions */
-        .question {
-            margin-bottom: 15px; /* Space below each question */
-        }
+.question {
+    margin-bottom: 15px;
+}
