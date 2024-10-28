@@ -307,28 +307,26 @@ def test_submit_quiz_answer():
 
 
 if __name__ == "__main__":
-    # Run all the test functions
-    print("-" * 50)
-    test_index()
-    print("-" * 50)
-    test_home()
-    print("-" * 50)
-    test_add_user()
-    print("-" * 50)
-    test_login()
-    print("-" * 50)
-    test_logout()
-    print("-" * 50)
-    test_create_quiz()
-    print("-" * 50)
-    test_penalty()
-    print("-" * 50)
-    test_quiz_detail()
-    print("-" * 50)
-    test_take_quiz()
-    print("-" * 50)
-    test_submit_quiz()
-    print("-" * 50)
-    test_submit_quiz_answer()
+    # List of test function names
+    test_functions = [
+        "test_index",
+        "test_home",
+        "test_add_user",
+        "test_login",
+        "test_logout",
+        "test_create_quiz",
+        "test_penalty",
+        "test_quiz_detail",
+        "test_take_quiz",
+        "test_submit_quiz",
+        "test_submit_quiz_answer"
+    ]
+
+    # Iterate over the test functions and call each one dynamically
+    for test_func in test_functions:
+        print("-" * 50)
+        # Use globals() to dynamically call each test function
+        globals()[test_func]()
+    
     print("-" * 50)
     print("All tests completed.")
