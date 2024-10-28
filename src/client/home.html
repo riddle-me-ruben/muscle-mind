@@ -1,15 +1,17 @@
+<!--home.html-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/static/home.css">
     <title>Home</title>
+    <link rel="stylesheet" href="/static/home.css"> <!-- Linking your existing CSS -->
 </head>
 <body>
 
-    <h1>Welcome to the Muscle Mind!</h1>
+    <h1>Welcome to Muscle Mind!</h1>
 
+    <!-- Button to create a quiz -->
     <a href="{{ url_for('create_quiz_route') }}">
         <button class="create-quiz-button">Create Quiz</button>
     </a>
@@ -19,21 +21,29 @@
     <h2>Your Quizzes:</h2>
     <ul>
         {% for quiz in quizzes %}
-        <li>
-            <!-- Make the whole quiz-container clickable -->
-            <a href="{{ url_for('take_quiz_route', quiz_id=quiz[0], question_num=0) }}" style="text-decoration: none;">
+            <li class="quiz-item">
                 <div class="quiz-container">
+                    <!-- Display the quiz title -->
                     <span class="quiz-title">{{ quiz[1] }}</span>
-                </div>
-            </a>
 
-        </li>
+                    <!-- Button container for better alignment and layout -->
+                    <div class="button-group">
+                        <a href="{{ url_for('quiz_detail_route', quiz_id=quiz[0]) }}">
+                            <button class="view-quiz-button">View Quiz</button>
+                        </a>
+                        <a href="{{ url_for('take_quiz_route', quiz_id=quiz[0], question_num=0) }}">
+                            <button class="take-quiz-button">Take Quiz</button>
+                        </a>
+                    </div>
+                </div>
+            </li>
         {% endfor %}
     </ul>
     {% else %}
-    <p>No quizzes available.</p> <!-- Message if no quizzes exist -->
+    <p>No quizzes available.</p>
     {% endif %}
 
+    <!-- Log out button -->
     <a href="{{ url_for('logout') }}">
         <button class="logout-button">Log Out</button>
     </a>

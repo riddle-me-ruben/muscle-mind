@@ -1,3 +1,4 @@
+/* home.css */
 * {
     margin: 0;
     padding: 0;
@@ -57,25 +58,43 @@ ul {
     margin: 10px 0;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s;
-    cursor: pointer;
     text-align: center;
 }
 
 .quiz-item:hover {
-    transform: scale(1.12);
+    transform: scale(1.05);
 }
 
 .quiz-title {
-    font-size: 1.8em;
+    font-size: 2em;
     font-weight: bold;
     color: #333;
-    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: block;
 }
 
-a {
-    text-decoration: none;
-    color: inherit;
-    display: block;
+.button-group {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.view-quiz-button,
+.take-quiz-button {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.view-quiz-button:hover,
+.take-quiz-button:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
 }
 
 .logout-button {
@@ -94,17 +113,3 @@ a {
     background-color: #d32f2f;
 }
 
-.quiz-container {
-    background-color: #f0f0f0;
-    border: 2px solid #ccc;
-    border-radius: 8px;
-    padding: 20px;
-    margin: 10px 0;
-    text-align: center;
-    transition: background-color 0.3s;
-}
-
-.quiz-container:hover {
-    background-color: #4A90E2;
-    transform: scale(1.12);
-}
