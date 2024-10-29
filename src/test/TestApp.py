@@ -7,8 +7,8 @@ from App import App
 app_instance = App()
 app = app_instance.app
 
-# Sample email for testing purposes
-sample_email = 'test@example.com'
+# Sample email for testing purposes (change for new account)
+sample_email = 'test1@example.com'
 
 """
 @requires The user is not signed in.
@@ -73,7 +73,7 @@ def test_add_user():
     """
     with app.test_client() as client:
         try:
-            data = {'email': 'new_user@example.com', 'password': 'newpass'}
+            data = {'email': sample_email, 'password': 'newpass'}  # Changed to use sample_email
             response = client.post('/add_user', data=data)
             if isinstance(response.data, bytes):
                 print("Add user route test passed")
