@@ -3,25 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/quiz-detail.css">
     <title>{{ quiz.title }} - Quiz Details</title>
 </head>
 <body>
 
 <h1>{{ quiz.title }}</h1>  <!-- Display the quiz title -->
 
-<!-- Display the questions and options -->
-{% for question in quiz.questions %}
-    <h2>{{ question.question }}</h2>  <!-- Display the question text -->
+<div class="content-box">
+    <!-- Display the questions and options -->
+    {% for question in quiz.questions %}
+        <h2>{{ question.question }}</h2>  <!-- Display the question text -->
 
-    <ul>
-        <li>A: {{ question.options[0] }}</li>  <!-- Option 1 -->
-        <li>B: {{ question.options[1] }}</li>  <!-- Option 2 -->
-        <li>C: {{ question.options[2] }}</li>  <!-- Option 3 -->
-        <li>D: {{ question.options[3] }}</li>  <!-- Option 4 -->
-    </ul>
+        <ul>
+            <li>A: {{ question.options[0] }}</li>  <!-- Option 1 -->
+            <li>B: {{ question.options[1] }}</li>  <!-- Option 2 -->
+            <li>C: {{ question.options[2] }}</li>  <!-- Option 3 -->
+            <li>D: {{ question.options[3] }}</li>  <!-- Option 4 -->
+        </ul>
 
-    <p>Correct Answer: {{ question.correct_option }}</p>  <!-- Display the correct option -->
-{% endfor %}
+        <p>Correct Answer: {{ question.correct_option }}</p>  <!-- Display the correct option -->
+    {% endfor %}
+</div>
 
 <a href="{{ url_for('home') }}">
     <button>Back to Home</button>
