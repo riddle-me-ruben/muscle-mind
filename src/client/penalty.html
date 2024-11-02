@@ -4,28 +4,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/timer.css">
     <title>Penalty</title>
 </head>
 <body>
-        <h1>Wrong Answer. Do 10 pushups.</h1>
-        
-        <div class="pushup-container">
-            <div class="pushup-person">
-                <div class="pushup-body"></div>
-                <div class="pushup-head"></div>
-            </div>
-            <div class="pushup-ground"></div>
+    <h1>Wrong Answer. Do 10 pushups.</h1>
+    
+    <div id="timer">10 seconds remaining</div> <!-- Timer display -->
+    <div class="pushup-container">
+        <div class="pushup-person">
+            <div class="pushup-body"></div>
+            <div class="pushup-head"></div>
         </div>
+        <div class="pushup-ground"></div>
+    </div>
+    
+    <!-- JavaScript for Countdown Timer and Conditional Redirection -->
+    <script>
+        let timeLeft = 10; // Set countdown time in seconds
+        const timerElement = document.getElementById("timer");
+
+        // URLs for next question or score page
+        const nextQuestionUrl = "{{ url_for('take_quiz_route', quiz_id=quiz_id, question_num=question_num + 1) }}";
+        const scoreUrl = "{{ url_for('score_route', quiz_id=quiz_id, score=score, total=total_questions) }}";
         
-        {% if question_num < total_questions - 1 %}
-            <a href="{{ url_for('take_quiz_route', quiz_id=quiz_id, question_num=question_num + 1) }}">
-                <button>Go to Next Question</button>
-            </a>
-        {% else %}
-            <a href="{{ url_for('score_route', quiz_id=quiz_id, score=score, total=total_questions) }}">
-                <button>View Score</button>
-            </a>
-        {% endif %}
+        // Inject Flask variables into JavaScript
+        const questionNum = {{ question_num }};
+        const totalQuestions = {{ total_questions }};
         
-        </body>
-        
+        // Determine if this is the last question
+        const isLastQuestion = questionNum >= totalQuestions - 1;
+
+        // Immediately update the display before starting the interval
+        timerElement.innerText = timeLeft + " seconds remaining";
+
+        const countdown = setInterval(() => {
+            timeLeft -= 1;
+            if (timeLeft <= 0) {
+                clearInterval(countdown);
+                // Redirect based on whether it's the last question or not
+                window.location.href = isLastQuestion ? scoreUrl : nextQuestionUrl;
+            } else {
+                timerElement.innerText = timeLeft + " seconds remaining";
+            }
+        }, 1000);
+    </script>
+</body>
+</html>
