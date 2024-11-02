@@ -1,6 +1,7 @@
 from QuizCreationManager import QuizCreationManager
 from QuizRetrievalManager import QuizRetrievalManager
 from QuizSubmissionManager import QuizSubmissionManager
+from flask import redirect, url_for, flash, session
 
 """
 The QuizManager class acts as a controller, delegating quiz-related tasks such as creation, retrieval, and submission to the respective manager classes.
@@ -15,10 +16,11 @@ class QuizManager:
     @requires A valid DatabaseManager and session object
     @ensures QuizManager is ready to handle quiz creation, retrieval, and submission
     """
-    def __init__(self, db_manager, session):
+    def __init__(self, db_manager):
         self.quiz_creation = QuizCreationManager(db_manager)
         self.quiz_retrieval = QuizRetrievalManager(db_manager)
         self.quiz_submission = QuizSubmissionManager(db_manager, self.quiz_retrieval)
+
 
     """
     Delegate the quiz creation process to QuizCreationManager
@@ -27,6 +29,18 @@ class QuizManager:
     """
     def create_quiz(self):
         return self.quiz_creation.create_quiz()
+
+    def delete_quiz(self, quiz_id):
+        """Handle the deletion of a quiz by ID, ensuring the user is logged in."""
+        # Check if the user is logged in and retrieve the email
+        if 'email' not in session:
+            return redirect(url_for('login'))
+        
+        user_email = session['email']
+        # Delegate the deletion to QuizRetrievalManager
+        self.quiz_retrieval.delete_quiz(quiz_id, user_email)
+        return redirect(url_for('home'))
+
 
     """
     Delegate the quiz submission process to QuizCreationManager

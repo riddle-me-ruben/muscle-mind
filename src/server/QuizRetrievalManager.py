@@ -15,6 +15,12 @@ class QuizRetrievalManager:
     def __init__(self, db_manager):
         self.db_manager = db_manager
 
+
+    def delete_quiz(self, quiz_id, user_email):
+        """Delete a quiz by its ID and user email."""
+        delete_query = "DELETE FROM quizzes WHERE quiz_id = %s AND user_email = %s"
+        self.db_manager.execute_commit(delete_query, (quiz_id, user_email))
+
     """
     Fetch the quiz by its ID and construct the quiz data
     quiz_id: int - The ID of the quiz
@@ -107,6 +113,10 @@ class QuizRetrievalManager:
     @ensures The quizzes created by the user are returned
     """
     def get_user_quizzes(self, user_email):
-        """Retrieve the quizzes created by the user."""
+        """Retrieve the quizzes created by the user and return them as a list of dictionaries."""
         query = "SELECT quiz_id, title FROM quizzes WHERE user_email = %s"
-        return self.db_manager.execute_query(query, (user_email,))
+        result = self.db_manager.execute_query(query, (user_email,))
+        
+        # Convert result to a list of dictionaries
+        quizzes = [{'quiz_id': row[0], 'title': row[1]} for row in result]
+        return quizzes

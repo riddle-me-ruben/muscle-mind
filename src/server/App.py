@@ -18,7 +18,7 @@ class App:
         
         # Initialize managers
         self.db_manager = DatabaseManager(self.app)
-        self.quiz_manager = QuizManager(self.db_manager, session)
+        self.quiz_manager = QuizManager(self.db_manager)
         self.user_manager = UserManager(self.db_manager, session)
         
         # Set up routes
@@ -42,6 +42,7 @@ class App:
         self.app.add_url_rule('/score/<int:quiz_id>/<int:score>/<int:total>', 'score_route', self.quiz_manager.score)
         self.app.add_url_rule('/submit-quiz-answer/<int:quiz_id>/<int:question_num>', 'submit_quiz_answer_route', self.quiz_manager.submit_quiz_answer, methods=['POST'])
         self.app.add_url_rule('/penalty/<int:quiz_id>/<int:question_num>', 'penalty_route', self.quiz_manager.penalty)
+        self.app.add_url_rule('/delete-quiz/<int:quiz_id>', 'delete_quiz_route', self.quiz_manager.delete_quiz, methods=['POST'])
 
     """
     Render the index page or redirect to home if user is signed in

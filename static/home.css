@@ -113,3 +113,18 @@ ul {
     background-color: #d32f2f;
 }
 
+.delete-quiz-button {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.delete-quiz-button:hover {
+    background-color: #d32f2f;
+    transform: scale(1.05);
+}
