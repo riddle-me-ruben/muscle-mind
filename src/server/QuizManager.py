@@ -30,14 +30,18 @@ class QuizManager:
     def create_quiz(self):
         return self.quiz_creation.create_quiz()
 
+    """
+    Handle the deletion of a quiz by ID, ensuring the user is logged in
+    quiz_id: int - The ID of the quiz
+    @requires A valid quiz_id and user session
+    @ensures The quiz is deleted and the user is redirected to the home page
+    """
     def delete_quiz(self, quiz_id):
-        """Handle the deletion of a quiz by ID, ensuring the user is logged in."""
-        # Check if the user is logged in and retrieve the email
         if 'email' not in session:
             return redirect(url_for('login'))
         
         user_email = session['email']
-        # Delegate the deletion to QuizRetrievalManager
+
         self.quiz_retrieval.delete_quiz(quiz_id, user_email)
         return redirect(url_for('home'))
 
