@@ -102,15 +102,18 @@ ul {
     color: white;
     border: none;
     border-radius: 5px;
-    padding: 10px 20px;
-    font-size: 1em;
+    padding: 15px 30px; /* Match the padding of create-quiz-button */
+    font-size: 1.5em; /* Match the font size of create-quiz-button */
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, transform 0.3s; /* Add transform effect */
+    width: 100%; /* Match the width of create-quiz-button */
+    max-width: 400px;
     margin-top: 20px;
 }
 
 .logout-button:hover {
     background-color: #d32f2f;
+    transform: scale(1.05); /* Add hover transform effect */
 }
 
 .delete-quiz-button {
