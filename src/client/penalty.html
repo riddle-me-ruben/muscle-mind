@@ -8,7 +8,7 @@
     <title>Penalty</title>
 </head>
 <body>
-    <h1>Wrong Answer. Do 10 pushups.</h1>
+    <h1 id="exercise-message"></h1>
     
     <div id="timer">10 seconds remaining</div> <!-- Timer display -->
     <div class="pushup-container">
@@ -19,8 +19,21 @@
         <div class="pushup-ground"></div>
     </div>
     
-    <!-- JavaScript for Countdown Timer and Conditional Redirection -->
+    <!-- JavaScript for Countdown Timer, Random Exercise, and Conditional Redirection -->
     <script>
+        // List of exercises
+        const exercises = [
+            "Do 5 situps",
+            "Do 10 jumping jacks",
+            "Do 5 burpees",
+            "Do 5 squats"
+        ];
+        
+        // Randomly select an exercise and display it
+        const exerciseMessage = exercises[Math.floor(Math.random() * exercises.length)];
+        document.getElementById("exercise-message").innerText = exerciseMessage;
+
+        // Timer setup
         let timeLeft = 10; // Set countdown time in seconds
         const timerElement = document.getElementById("timer");
 
