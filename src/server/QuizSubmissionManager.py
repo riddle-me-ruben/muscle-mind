@@ -26,6 +26,10 @@ class QuizSubmissionManager:
     """
     def take_quiz(self, quiz_id, question_num):
         quiz = self.retrieval_manager.get_quiz_by_id(quiz_id)
+
+        if quiz is None:
+            return "Quiz not found", 404
+
         if question_num >= len(quiz['questions']):
             return redirect(url_for('home'))
         return render_template('take-quiz.html', quiz=quiz, question_num=question_num, quiz_id=quiz_id)
@@ -39,6 +43,10 @@ class QuizSubmissionManager:
     """
     def submit_quiz_answer(self, quiz_id, question_num):
         quiz = self.retrieval_manager.get_quiz_by_id(quiz_id)
+
+        if quiz is None:
+            return "Quiz not found", 404
+
         user_answer = request.form.get('answer')
         correct_answer = quiz['questions'][question_num]['correct_option']
         current_score = session.get('current_score', 0)
@@ -73,4 +81,6 @@ class QuizSubmissionManager:
     """
     def penalty(self, quiz_id, question_num):
         quiz = self.retrieval_manager.get_quiz_by_id(quiz_id)
+        if quiz is None:
+            return "Quiz not found", 404
         return render_template('penalty.html', quiz_id=quiz_id, question_num=question_num, total_questions=len(quiz['questions']), score=session.get('current_score', 0))
