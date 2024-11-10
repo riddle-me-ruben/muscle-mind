@@ -1,49 +1,70 @@
-/* home.css */
+/* Reset some default styles */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+/* Body styling */
 body {
-    font-family: Arial, sans-serif;
-    background: linear-gradient(to bottom, #f4f4f4, #4A90E2);
-    color: #333;
-    line-height: 1.6;
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(to bottom, #1c1f26, #4A90E2);
+    color: #ffffff;
     display: flex;
-    flex-direction: column;
-    align-items: center;
     justify-content: center;
+    align-items: center;
     height: 100vh;
-    padding: 20px;
-}
-
-h1 {
+    padding: 0 20px;
     text-align: center;
-    font-size: 3.5em;
-    margin-bottom: 20px;
-    color: #4A90E2;
 }
 
-.create-quiz-button {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 15px 30px;
-    font-size: 1.5em;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.3s;
+/* Header styling */
+h1 {
+    font-size: 36px;
     margin-bottom: 30px;
+    color: #00d1b2;
+    text-shadow: 0px 0px 13px #00d1b2;
+}
+
+/* Button styles */
+.create-quiz-button,
+.logout-button {
     width: 100%;
     max-width: 400px;
+    padding: 15px 30px;
+    font-size: 1.5em;
+    border-radius: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+    margin-bottom: 20px;
+}
+
+/* Create quiz button */
+.create-quiz-button {
+    background-color: #00d1b2;
+    color: white;
+    border: none;
 }
 
 .create-quiz-button:hover {
-    background-color: #45a049;
+    background-color: #00b89a;
     transform: scale(1.05);
 }
 
+/* Logout button */
+.logout-button {
+    background-color: #f44336;
+    color: white;
+    border: none;
+}
+
+.logout-button:hover {
+    background-color: #d32f2f;
+    transform: scale(1.05);
+}
+
+/* Quiz items */
 ul {
     list-style-type: none;
     padding: 0;
@@ -52,41 +73,43 @@ ul {
 }
 
 .quiz-item {
-    background: white;
-    border-radius: 5px;
-    padding: 15px;
+    background: #333a48;
+    border-radius: 12px;
+    padding: 20px;
     margin: 10px 0;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 13px 26px rgba(0, 0, 0, 0.3);
     transition: transform 0.3s;
-    text-align: center;
+    color: #ffffff;
 }
 
 .quiz-item:hover {
     transform: scale(1.05);
 }
 
+/* Quiz title */
 .quiz-title {
-    font-size: 2em;
+    font-size: 1.8em;
     font-weight: bold;
-    color: #333;
+    color: #ffffff;
     margin-bottom: 10px;
-    display: block;
 }
 
+/* Button group */
 .button-group {
     display: flex;
     justify-content: center;
     gap: 20px;
 }
 
+/* View quiz and take quiz buttons */
 .view-quiz-button,
 .take-quiz-button {
     background-color: #007BFF;
     color: white;
     border: none;
-    border-radius: 5px;
-    padding: 10px 20px;
-    font-size: 1em;
+    border-radius: 12px;
+    padding: 12px 22px;
+    font-size: 1.2em;
     cursor: pointer;
     transition: background-color 0.3s, transform 0.3s;
 }
@@ -97,32 +120,14 @@ ul {
     transform: scale(1.05);
 }
 
-.logout-button {
-    background-color: #f44336;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 15px 30px; /* Match the padding of create-quiz-button */
-    font-size: 1.5em; /* Match the font size of create-quiz-button */
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.3s; /* Add transform effect */
-    width: 100%; /* Match the width of create-quiz-button */
-    max-width: 400px;
-    margin-top: 20px;
-}
-
-.logout-button:hover {
-    background-color: #d32f2f;
-    transform: scale(1.05); /* Add hover transform effect */
-}
-
+/* Delete quiz button */
 .delete-quiz-button {
     background-color: #f44336;
     color: white;
     border: none;
-    border-radius: 5px;
-    padding: 10px 20px;
-    font-size: 1em;
+    border-radius: 12px;
+    padding: 12px 22px;
+    font-size: 1.2em;
     cursor: pointer;
     transition: background-color 0.3s, transform 0.3s;
 }
@@ -130,4 +135,24 @@ ul {
 .delete-quiz-button:hover {
     background-color: #d32f2f;
     transform: scale(1.05);
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 650px) {
+    .create-quiz-button,
+    .logout-button,
+    .view-quiz-button,
+    .take-quiz-button,
+    .delete-quiz-button {
+        font-size: 1.2em;
+        padding: 12px 25px;
+    }
+
+    h1 {
+        font-size: 32px;
+    }
+
+    .quiz-title {
+        font-size: 1.6em;
+    }
 }

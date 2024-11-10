@@ -1,3 +1,4 @@
+/* Reset some default styles */
 * {
     margin: 0;
     padding: 0;
@@ -5,85 +6,137 @@
 }
 
 body {
-    font-family: Arial, sans-serif;
-    background: linear-gradient(to bottom, #f4f4f4, #4A90E2);
+    font-family: 'Arial', sans-serif;
+    background-color: #1c1f26;
+    background-size: cover; /* Ensures the image covers the entire viewport */
+    background-position: center; /* Centers the image */
+    background-repeat: no-repeat; /* Prevents repeating the image */
+    color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    flex-direction: column;
+    text-align: center;
+}
+
+/* Big Go Back Symbol */
+.go-back-symbol {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 72px;
+    color: #00d1b2;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.go-back-symbol:hover {
+    color: #00b89a;
+}
+
+/* Quiz Title */
+h1 {
+    font-size: 46px;
+    margin-bottom: 32px;
+    color: #00d1b2;
+    text-shadow: 0px 0px 13px #00d1b2;
+}
+
+/* Container for the quiz form */
+form {
+    width: 90%;
+    max-width: 620px;
+    padding: 30px;
+    background-color: #282c34;
+    border-radius: 13px;
+    box-shadow: 0 13px 26px rgba(0, 0, 0, 0.3);
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
+    align-items: flex-start; /* Align the form content to the left */
 }
 
-h1 {
-    color: #333;
-    margin-bottom: 60px;
-    font-size: 3em;
-}
-
-form {
-    background-color: #fff;
-    padding: 60px;
-    border-radius: 12px;
-    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
-    width: 600px;
-    text-align: left;
-}
-
-label {
-    margin-bottom: 15px;
-    display: block;
-    font-weight: bold;
-    font-size: 2em;
-}
-
-input[type="email"],
-input[type="password"] {
+/* Question and option styling */
+.question {
     width: 100%;
-    padding: 20px;
     margin-bottom: 20px;
-    border: 2px solid #ccc;
-    border-radius: 6px;
-    font-size: 20px;
 }
 
-input[type="email"]:focus,
-input[type="password"]:focus {
-    border-color: #007BFF;
-    outline: none;
+.question p {
+    font-size: 32px;
+    color: #a1a7c2;
+    margin-bottom: 20px;
 }
 
-button {
-    background-color: #007BFF;
-    color: white;
-    border: none;
-    padding: 30px;
-    border-radius: 6px;
+/* Align labels to the left */
+label {
+    font-size: 28px;
+    color: #a1a7c2;
+    display: block;
+    margin-bottom: 12px;
     cursor: pointer;
-    font-size: 22px;
+    text-align: left; /* Align text within labels to the left */
+    width: 100%; /* Ensure labels take up full width */
+}
+
+/* Larger Radio button styling */
+input[type="radio"] {
+    margin-right: 10px;
+    accent-color: #00d1b2; /* Accent color for the radio buttons */
+    width: 30px;  /* Increase the width */
+    height: 30px; /* Increase the height */
+    margin-top: 5px; /* Adjust vertical alignment */
+}
+
+/* Submit button styling */
+button {
     width: 100%;
+    height: 55px;
+    padding: 0 22px;
+    background-color: #00d1b2;
+    color: #ffffff;
+    border: none;
+    border-radius: 12px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
 }
 
 button:hover {
-    background-color: #0056b3;
+    background-color: #00b89a;
 }
 
-p {
-    margin-top: 30px;
-    font-size: 30px;
+button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px #00d1b2, 0 0 0 5px rgba(0, 209, 178, 0.4);
 }
 
-a {
-    color: #007BFF;
-    text-decoration: none;
-    font-size: 30px;
+/* Focus styles for accessibility */
+input:focus,
+button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px #00d1b2, 0 0 0 5px rgba(0, 209, 178, 0.4);
 }
 
-a:hover {
-    text-decoration: underline;
-}
+/* Responsive adjustments */
+@media (max-width: 650px) {
+    form {
+        width: 95%;
+        padding: 26px;
+    }
 
-.error {
-    color: red;
-    font-weight: bold;
-    font-size: 30px;
+    h1 {
+        font-size: 31px;
+    }
+
+    label {
+        font-size: 16px;
+    }
+
+    button {
+        font-size: 16px;
+        height: 50px;
+    }
 }

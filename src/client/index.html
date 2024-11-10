@@ -1,35 +1,84 @@
-<!-- client/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create an Account</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/login.css">
 </head>
 <body>
-    <h1>Create an Account</h1>
+    <div class="container">
+        <h1>Create an Account</h1>
 
-    <!-- Error message (if any) -->
-    {% if error2 %}
-        <p style="color: red;">{{ error2 }}</p>
-    {% endif %}
+        {% if error2 %}
+            <p class="error">{{ error2 }}</p>
+        {% endif %}
 
-    <!-- Success message (if any) -->
-    {% if success2 %}
-        <p style="color: green;">{{ success2 }}</p>
-    {% endif %}
+        {% if success2 %}
+            <p class="success">{{ success2 }}</p>
+        {% endif %}
 
-    <form action="/add_user" method="POST">
-        <label for="email">Enter an Email:</label>
-        <input type="email" id="email" name="email" required>
-        <br>
-        <label for="password">Enter a Password:</label>
-        <input type="password" id="password" name="password" required>
-        <br>
-        <button type="submit">Sign Up</button>
-    </form>
+        <form action="/add_user" method="POST" onsubmit="return validatePasswords()">
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email" required>
+            </div>
 
-    <p>Already have an account? <a href="/login">Log in here</a></p>
+            <div class="form-group">
+                <label for="password">Enter a Password:</label>
+                <div class="password-container">
+                    <input type="password" id="password" name="password" required>
+                    <button type="button" class="eye-toggle" onclick="togglePasswordVisibility('password', 'eye-icon')">
+                        <svg class="eye-icon" id="eye-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="confirm-password">Confirm Password:</label>
+                <div class="password-container">
+                    <input type="password" id="confirm-password" name="confirm-password" required>
+                    <button type="button" class="eye-toggle" onclick="togglePasswordVisibility('confirm-password', 'confirm-eye-icon')">
+                        <svg class="eye-icon" id="confirm-eye-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-button">Sign Up</button>
+        </form>
+
+        <p>Already have an account? <a href="/login">Log in here</a></p>
+    </div>
+
+    <script>
+        function togglePasswordVisibility(inputId, iconId) {
+            const passwordInput = document.getElementById(inputId);
+            const eyeIcon = document.getElementById(iconId);
+            
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+            } else {
+                passwordInput.type = "password";
+            }
+        }
+
+        function validatePasswords() {
+            const password = document.getElementById("password").value;
+            const confirmPassword = document.getElementById("confirm-password").value;
+
+            if (password !== confirmPassword) {
+                alert("Passwords do not match. Please make sure both passwords are identical.");
+                return false; // Prevent form submission
+            }
+
+            return true; // Allow form submission
+        }
+    </script>
 </body>
 </html>

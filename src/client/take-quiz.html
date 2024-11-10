@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/style.css">
-
     <title>Take Quiz - {{ quiz['title'] }}</title>
 </head>
 <body>
+
+<!-- Big, Chunky Go Back Symbol -->
+<a href="{{ url_for('home') }}" class="go-back-symbol">←</a>
 
 <h1>{{ quiz['title'] }}</h1>
 

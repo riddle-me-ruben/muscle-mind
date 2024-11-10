@@ -1,76 +1,136 @@
-<!-- create-quiz.html-->
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/static/create-quiz.css">
     <title>Create a Quiz</title>
-    
+    <link rel="stylesheet" href="/static/create-quiz.css">
 </head>
+
 <body>
 
-    <!-- Flash message section -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-    <ul>
-    {% for category, message in messages %}
-        <li class="{{ category }}">{{ message }}</li>
-    {% endfor %}
-    </ul>
-    {% endif %}
-    {% endwith %}
+    <!-- Main container -->
+    <div class="container">
 
-    <h1>Create a New Quiz</h1>
-
-    <a href="{{ url_for('home') }}">
-        <button>Return to Home</button>
-    </a>
-
-    <!-- Form to get the number of questions and quiz title -->
-    <form method="POST" action="{{ url_for('create_quiz_route') }}">
-        <label for="num_questions">How many questions do you want to create (max 10)?</label>
-        <input type="number" id="num_questions" name="num_questions" min="1" max="10" required>
-
-        <label for="title">Quiz Title:</label>
-        <input type="text" id="title" name="title" placeholder="Enter quiz title" required>
-
-        <button type="submit">Start Quiz Creation</button>
-    </form>
-
-    <!-- Form to submit quiz with dynamically generated questions -->
-    {% if num_questions %}
-    <form method="POST" action="{{ url_for('submit_quiz_route') }}">
-        <!-- Hidden input to store the quiz title -->
-        <input type="hidden" name="title" value="{{ title }}">
-
-        <!-- Loop through the number of questions and render input fields dynamically -->
-        {% for i in range(num_questions) %}
-        <div class="question">
-            <label>Question {{ i+1 }}:</label>
-            <input type="text" name="question_text_{{ i }}" placeholder="Enter your question" required>
-
-            <label>Option 1:</label>
-            <input type="text" name="answer_{{ i }}_1" required>
-
-            <label>Option 2:</label>
-            <input type="text" name="answer_{{ i }}_2" required>
-
-            <label>Option 3:</label>
-            <input type="text" name="answer_{{ i }}_3" required>
-
-            <label>Option 4:</label>
-            <input type="text" name="answer_{{ i }}_4" required>
-
-            <label>Correct Answer:</label>
-            <input type="radio" name="correct_answer_{{ i }}" value="A" required> A
-            <input type="radio" name="correct_answer_{{ i }}" value="B"> B
-            <input type="radio" name="correct_answer_{{ i }}" value="C"> C
-            <input type="radio" name="correct_answer_{{ i }}" value="D"> D
+        <!-- Flash messages section -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-message-container">
+            <ul class="flash-message">
+            {% for category, message in messages %}
+                <li class="{{ category }}">{{ message }}</li>
+            {% endfor %}
+            </ul>
         </div>
-        {% endfor %}
-        <button type="submit">Create Quiz</button>
-    </form>
-    {% endif %}
+        {% endif %}
+        {% endwith %}
+
+        <h1>Create a New Quiz</h1>
+
+        <!-- Button to return to home page -->
+        <a href="{{ url_for('home') }}">
+            <button class="btn btn-back">Return to Home</button>
+        </a>
+
+        <!-- Form to input number of questions and quiz title (only shown if num_questions is not set) -->
+        {% if not num_questions %}
+        <section class="form-section">
+            <form method="POST" action="{{ url_for('create_quiz_route') }}" class="quiz-form">
+                <div class="form-group">
+                    <label for="num_questions">How many questions do you want to create? (max 10)</label>
+                    <input type="number" id="num_questions" name="num_questions" min="1" max="10" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="title">Quiz Title:</label>
+                    <input type="text" id="title" name="title" placeholder="Enter quiz title" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Start Quiz Creation</button>
+            </form>
+        </section>
+        {% endif %}
+
+        <!-- Form to input questions and answers dynamically after selecting num_questions -->
+        {% if num_questions %}
+        <section class="form-section">
+            <form method="POST" action="{{ url_for('submit_quiz_route') }}" class="quiz-form">
+                <input type="hidden" name="title" value="{{ title }}">
+
+                {% for i in range(num_questions) %}
+                <div class="question">
+                    <fieldset>
+                        <legend>Question {{ i+1 }}:</legend>
+
+                        <div class="form-group">
+                            <label for="question_text_{{ i }}">Question Text:</label>
+                            <input type="text" name="question_text_{{ i }}" id="question_text_{{ i }}" placeholder="Enter your question" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="answer_{{ i }}_1">Option 1:</label>
+                            <input type="text" name="answer_{{ i }}_1" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="answer_{{ i }}_2">Option 2:</label>
+                            <input type="text" name="answer_{{ i }}_2" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="answer_{{ i }}_3">Option 3:</label>
+                            <input type="text" name="answer_{{ i }}_3" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="answer_{{ i }}_4">Option 4:</label>
+                            <input type="text" name="answer_{{ i }}_4" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Correct Answer:</label>
+                            <div class="radio-group">
+                                <input type="radio" name="correct_answer_{{ i }}" value="A" required> A
+                                <input type="radio" name="correct_answer_{{ i }}" value="B"> B
+                                <input type="radio" name="correct_answer_{{ i }}" value="C"> C
+                                <input type="radio" name="correct_answer_{{ i }}" value="D"> D
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                {% endfor %}
+
+                <button type="submit" class="btn btn-primary">Create Quiz</button>
+            </form>
+        </section>
+        {% endif %}
+
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const inputs = document.querySelectorAll('.form-group input');
+            
+            inputs.forEach(input => {
+                input.addEventListener('input', debounce(function() {
+                    // Handle form data or other operations here
+                }, 300)); // Debounce time is set to 300ms
+            });
+        });
+        
+        // Debounce function to limit how often an event is triggered
+        function debounce(func, wait) {
+            let timeout;
+            return function () {
+                const context = this;
+                const args = arguments;
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(context, args), wait);
+            };
+        }
+        
+    </script>
+
 </body>
+
 </html>

@@ -11,6 +11,11 @@
     <h1 id="exercise-message"></h1>
     
     <div id="timer">10 seconds remaining</div> <!-- Timer display -->
+    
+    <!-- Image for the exercise (GIF) -->
+    <img id="exercise-gif" src="" alt="Exercise GIF" style="width: 500px; height: auto; margin-top: 20px;">
+
+    
     <div class="pushup-container">
         <div class="pushup-person">
             <div class="pushup-body"></div>
@@ -21,17 +26,21 @@
     
     <!-- JavaScript for Countdown Timer, Random Exercise, and Conditional Redirection -->
     <script>
-        // List of exercises
+        // List of exercises and their corresponding GIF URLs
         const exercises = [
-            "Do 5 situps",
-            "Do 10 jumping jacks",
-            "Do 5 burpees",
-            "Do 5 squats"
+            { name: "Do 5 situps", gif: "/static/situps.gif" },
+            { name: "Do 10 jumping jacks", gif: "/static/jumping-jacks.gif" },
+            { name: "Do 5 burpees", gif: "/static/burpees.gif" },
+            { name: "Do 5 squats", gif: "/static/squats.gif" }
         ];
-        
+
         // Randomly select an exercise and display it
-        const exerciseMessage = exercises[Math.floor(Math.random() * exercises.length)];
-        document.getElementById("exercise-message").innerText = exerciseMessage;
+        const selectedExercise = exercises[Math.floor(Math.random() * exercises.length)];
+        document.getElementById("exercise-message").innerText = selectedExercise.name;
+        
+        // Show the corresponding GIF
+        const gifElement = document.getElementById("exercise-gif");
+        gifElement.src = selectedExercise.gif;
 
         // Timer setup
         let timeLeft = 10; // Set countdown time in seconds
