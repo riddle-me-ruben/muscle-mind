@@ -5,6 +5,12 @@ from UserManager import UserManager
 from dotenv import load_dotenv
 import os
 
+"""
+The App class initializes and manages the Flask application for the Muscle-Mind system, acting as the central 
+mediator between the database subsystem and the quiz management subsystem. This class configures the app, 
+sets up environment variables, manages user sessions, and provides a streamlined interface to handle quiz 
+creation, user management, and data retrieval from the database.
+"""
 class App:
     """
     Initialize the App class and set up the Flask app, database manager, and other managers

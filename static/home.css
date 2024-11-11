@@ -99,12 +99,13 @@ ul {
     display: flex;
     justify-content: center;
     gap: 20px;
+    color: #00b89a;
 }
 
 /* View quiz and take quiz buttons */
 .view-quiz-button,
 .take-quiz-button {
-    background-color: #007BFF;
+    background-color: #00d1b2;
     color: white;
     border: none;
     border-radius: 12px;
@@ -116,7 +117,7 @@ ul {
 
 .view-quiz-button:hover,
 .take-quiz-button:hover {
-    background-color: #0056b3;
+    background-color: #00b89a;
     transform: scale(1.05);
 }
 
