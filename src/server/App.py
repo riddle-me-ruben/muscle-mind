@@ -47,19 +47,26 @@ class App:
     @ensures All app routes are defined and linked to corresponding methods
     """
     def initialize_routes(self):
-        self.app.add_url_rule('/', 'index', self.index)
-        self.app.add_url_rule('/add_user', 'add_user', self.user_manager.add_user, methods=['POST'])
-        self.app.add_url_rule('/login', 'login', self.user_manager.login, methods=['GET', 'POST'])
-        self.app.add_url_rule('/home', 'home', self.home)
-        self.app.add_url_rule('/logout', 'logout', self.user_manager.logout)
-        self.app.add_url_rule('/create-quiz', 'create_quiz_route', self.quiz_manager.create_quiz, methods=['GET', 'POST'])
-        self.app.add_url_rule('/submit-quiz', 'submit_quiz_route', self.quiz_manager.submit_quiz, methods=['POST'])
-        self.app.add_url_rule('/quiz/<int:quiz_id>', 'quiz_detail_route', self.quiz_manager.quiz_detail)
-        self.app.add_url_rule('/take-quiz/<int:quiz_id>/<int:question_num>', 'take_quiz_route', self.quiz_manager.take_quiz, methods=['GET', 'POST'])
-        self.app.add_url_rule('/score/<int:quiz_id>/<int:score>/<int:total>', 'score_route', self.quiz_manager.score)
-        self.app.add_url_rule('/submit-quiz-answer/<int:quiz_id>/<int:question_num>', 'submit_quiz_answer_route', self.quiz_manager.submit_quiz_answer, methods=['POST'])
-        self.app.add_url_rule('/penalty/<int:quiz_id>/<int:question_num>', 'penalty_route', self.quiz_manager.penalty)
-        self.app.add_url_rule('/delete-quiz/<int:quiz_id>', 'delete_quiz_route', self.quiz_manager.delete_quiz, methods=['POST'])
+        # Define routes with various HTTP methods
+        route_definitions = [
+            ('/', 'index', self.index, ['GET']),
+            ('/add_user', 'add_user', self.user_manager.add_user, ['POST']),
+            ('/login', 'login', self.user_manager.login, ['GET', 'POST']),
+            ('/home', 'home', self.home, ['GET']),
+            ('/logout', 'logout', self.user_manager.logout, ['GET']),
+            ('/create-quiz', 'create_quiz_route', self.quiz_manager.create_quiz, ['GET', 'POST']),
+            ('/submit-quiz', 'submit_quiz_route', self.quiz_manager.submit_quiz, ['POST']),
+            ('/quiz-detail/<int:quiz_id>', 'quiz_detail_route', self.quiz_manager.quiz_detail, ['GET']),
+            ('/take-quiz/<int:quiz_id>/<int:question_num>', 'take_quiz_route', self.quiz_manager.take_quiz, ['GET', 'POST']),
+            ('/score/<int:quiz_id>/<int:score>/<int:total>', 'score_route', self.quiz_manager.score, ['GET']),
+            ('/submit-answer/<int:quiz_id>/<int:question_num>', 'submit_quiz_answer_route', self.quiz_manager.submit_quiz_answer, ['POST']),
+            ('/penalty/<int:quiz_id>/<int:question_num>', 'penalty_route', self.quiz_manager.penalty, ['GET']),
+            ('/delete-quiz/<int:quiz_id>', 'delete_quiz_route', self.quiz_manager.delete_quiz, ['POST'])
+        ]
+
+        # Loop through route definitions to add them to the app
+        for rule, endpoint, view_func, methods in route_definitions:
+            self.app.add_url_rule(rule, endpoint, view_func, methods=methods)
 
     """
     Render the index page or redirect to home if user is signed in
