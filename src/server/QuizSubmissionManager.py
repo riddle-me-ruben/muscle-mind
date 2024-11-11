@@ -69,6 +69,17 @@ class QuizSubmissionManager:
     @ensures The score page is rendered showing the final result
     """
     def score(self, quiz_id, score, total):
+        user_email = session.get('email')
+        if user_email:
+            query = """
+                INSERT INTO user_quiz_stats (user_email, quiz_id, questions_answered, score)
+                VALUES (%s, %s, %s, %s)
+                ON DUPLICATE KEY UPDATE
+                questions_answered = questions_answered + %s,
+                score = score + %s
+            """
+            self.db_manager.execute_commit(query, (user_email, quiz_id, total, score, total, score))
+        
         session.pop('current_score', None)
         return render_template('score.html', score=score, total=total)
 

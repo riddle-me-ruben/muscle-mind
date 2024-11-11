@@ -2,6 +2,7 @@ from flask import Flask, render_template, redirect, url_for, session
 from DatabaseManager import DatabaseManager
 from QuizManager import QuizManager
 from UserManager import UserManager
+from DataAnalyticsManager import DataAnalyticsManager
 from dotenv import load_dotenv
 import os
 
@@ -10,6 +11,15 @@ The App class initializes and manages the Flask application for the Muscle-Mind 
 mediator between the database subsystem and the quiz management subsystem. This class configures the app, 
 sets up environment variables, manages user sessions, and provides a streamlined interface to handle quiz 
 creation, user management, and data retrieval from the database.
+
+@requires:
+- Environment variables, including Flask app configurations and MySQL credentials, must be set.
+- DatabaseManager, QuizManager, and UserManager are instantiated and correctly set up to handle database and 
+    user operations.
+
+@ensures:
+- The app is fully configured and ready to mediate user interactions with the quiz and database subsystems.
+- Requests are directed to the correct endpoints, enabling efficient handling of quiz, user, and data operations.
 """
 class App:
     """
@@ -26,7 +36,8 @@ class App:
         self.db_manager = DatabaseManager(self.app)
         self.quiz_manager = QuizManager(self.db_manager)
         self.user_manager = UserManager(self.db_manager, session)
-        
+        self.analytics_manager = DataAnalyticsManager(self.db_manager)
+
         # Set up routes
         self.initialize_routes()
 
@@ -72,7 +83,8 @@ class App:
         
         user_email = session['email']
         quizzes = self.quiz_manager.get_user_quizzes(user_email)
-        return render_template('home.html', quizzes=quizzes)
+        analytics = self.analytics_manager.get_user_analytics()
+        return render_template('home.html', quizzes=quizzes, analytics=analytics)
 
     """
     Start the Flask app in debug mode
