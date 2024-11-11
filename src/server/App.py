@@ -99,6 +99,8 @@ class App:
     @ensures The Flask app is running in debug mode
     """
     def run(self):
+        port = int(os.environ.get('PORT', 10000))  # Use PORT environment variable
+        self.app.run(host='0.0.0.0', port=port, debug=True)
         self.app.run(debug=True)
 
 """
