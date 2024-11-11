@@ -23,9 +23,14 @@ class QuizRetrievalManager:
     @ensures The quiz data is returned including its questions and title
     """
     def delete_quiz(self, quiz_id, user_email):
-        """Delete a quiz by its ID and user email."""
-        delete_query = "DELETE FROM quizzes WHERE quiz_id = %s AND user_email = %s"
-        self.db_manager.execute_commit(delete_query, (quiz_id, user_email))
+        # Delete related entries in user_quiz_stats
+        delete_stats_query = "DELETE FROM user_quiz_stats WHERE quiz_id = %s AND user_email = %s"
+        self.db_manager.execute_commit(delete_stats_query, (quiz_id, user_email))
+        
+        # Delete the quiz itself
+        delete_quiz_query = "DELETE FROM quizzes WHERE quiz_id = %s AND user_email = %s"
+        self.db_manager.execute_commit(delete_quiz_query, (quiz_id, user_email))
+
 
     """
     Fetch the quiz by its ID and construct the quiz data

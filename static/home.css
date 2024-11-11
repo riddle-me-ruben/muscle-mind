@@ -54,13 +54,13 @@ h1 {
 
 /* Logout button */
 .logout-button {
-    background-color: #f44336;
+    background-color: #9000efde;
     color: white;
     border: none;
 }
 
 .logout-button:hover {
-    background-color: #d32f2f;
+    background-color: #470098;
     transform: scale(1.05);
 }
 
@@ -123,7 +123,7 @@ ul {
 
 /* Delete quiz button */
 .delete-quiz-button {
-    background-color: #f44336;
+    background-color: #9000efde;
     color: white;
     border: none;
     border-radius: 12px;
@@ -134,7 +134,7 @@ ul {
 }
 
 .delete-quiz-button:hover {
-    background-color: #d32f2f;
+    background-color: #7700ffb6;
     transform: scale(1.05);
 }
 
