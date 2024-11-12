@@ -14,30 +14,30 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    padding: 0 20px;
+    padding: 0 30px; /* increased from 20px */
     text-align: center;
 }
 
 /* Header styling */
 h1 {
-    font-size: 36px;
-    margin-bottom: 30px;
+    font-size: 54px; /* increased from 36px */
+    margin-bottom: 45px; /* increased from 30px */
     color: #00d1b2;
-    text-shadow: 0px 0px 13px #00d1b2;
+    text-shadow: 0px 0px 20px #00d1b2; /* increased from 13px */
 }
 
 /* Button styles */
 .create-quiz-button,
 .logout-button {
     width: 100%;
-    max-width: 400px;
-    padding: 15px 30px;
-    font-size: 1.5em;
-    border-radius: 12px;
+    max-width: 600px; /* increased from 400px */
+    padding: 22.5px 45px; /* increased from 15px 30px */
+    font-size: 2.25em; /* increased from 1.5em */
+    border-radius: 18px; /* increased from 12px */
     text-align: center;
     cursor: pointer;
     transition: background-color 0.3s, transform 0.3s;
-    margin-bottom: 20px;
+    margin-bottom: 30px; /* increased from 20px */
 }
 
 /* Create quiz button */
@@ -69,15 +69,15 @@ ul {
     list-style-type: none;
     padding: 0;
     width: 100%;
-    max-width: 600px;
+    max-width: 900px; /* increased from 600px */
 }
 
 .quiz-item {
     background: #333a48;
-    border-radius: 12px;
-    padding: 20px;
-    margin: 10px 0;
-    box-shadow: 0 13px 26px rgba(0, 0, 0, 0.3);
+    border-radius: 18px; /* increased from 12px */
+    padding: 30px; /* increased from 20px */
+    margin: 15px 0; /* increased from 10px */
+    box-shadow: 0 20px 39px rgba(0, 0, 0, 0.3); /* increased from 0 13px 26px */
     transition: transform 0.3s;
     color: #ffffff;
 }
@@ -88,17 +88,17 @@ ul {
 
 /* Quiz title */
 .quiz-title {
-    font-size: 1.8em;
+    font-size: 2.7em; /* increased from 1.8em */
     font-weight: bold;
     color: #ffffff;
-    margin-bottom: 10px;
+    margin-bottom: 15px; /* increased from 10px */
 }
 
 /* Button group */
 .button-group {
     display: flex;
     justify-content: center;
-    gap: 20px;
+    gap: 30px; /* increased from 20px */
     color: #00b89a;
 }
 
@@ -108,9 +108,9 @@ ul {
     background-color: #00d1b2;
     color: white;
     border: none;
-    border-radius: 12px;
-    padding: 12px 22px;
-    font-size: 1.2em;
+    border-radius: 18px; /* increased from 12px */
+    padding: 18px 33px; /* increased from 12px 22px */
+    font-size: 1.8em; /* increased from 1.2em */
     cursor: pointer;
     transition: background-color 0.3s, transform 0.3s;
 }
@@ -126,9 +126,9 @@ ul {
     background-color: #9000efde;
     color: white;
     border: none;
-    border-radius: 12px;
-    padding: 12px 22px;
-    font-size: 1.2em;
+    border-radius: 18px; /* increased from 12px */
+    padding: 18px 33px; /* increased from 12px 22px */
+    font-size: 1.8em; /* increased from 1.2em */
     cursor: pointer;
     transition: background-color 0.3s, transform 0.3s;
 }
@@ -145,15 +145,41 @@ ul {
     .view-quiz-button,
     .take-quiz-button,
     .delete-quiz-button {
-        font-size: 1.2em;
-        padding: 12px 25px;
+        font-size: 1.8em; /* increased from 1.2em */
+        padding: 18px 37.5px; /* increased from 12px 25px */
     }
 
     h1 {
-        font-size: 32px;
+        font-size: 48px; /* increased from 32px */
     }
 
     .quiz-title {
-        font-size: 1.6em;
+        font-size: 2.4em; /* increased from 1.6em */
     }
 }
+
+.analytics-section {
+    font-size: 1.5em; /* Increase font size */
+    padding: 30px; /* Add more padding around the section */
+    margin: 30px 0; /* Add more spacing above and below */
+    background-color: #2c2f38; /* Background color to make it stand out */
+    border-radius: 15px; /* Rounded corners */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Add a shadow for depth */
+}
+
+.analytics-section h2 {
+    font-size: 2em; /* Make the heading bigger */
+    margin-bottom: 20px; /* Add space below the heading */
+    color: #00d1b2; /* Accent color for heading */
+    text-shadow: 0px 0px 10px #00d1b2; /* Subtle glow */
+}
+
+.analytics-section p {
+    font-size: 1.2em; /* Increase the font size for paragraphs */
+    margin: 10px 0; /* Add some space between paragraphs */
+}
+
+.analytics-section p strong {
+    color: #00b89a; /* Accent color for key data points */
+}
+
