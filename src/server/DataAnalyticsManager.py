@@ -40,7 +40,7 @@ class DataAnalyticsManager:
             return None
         
         # Query to get the number of quizzes taken
-        quizzes_taken_query = "SELECT COUNT(DISTINCT quiz_id) FROM user_quiz_stats WHERE user_email = %s"
+        quizzes_taken_query = "SELECT COUNT(quiz_id) FROM user_quiz_stats WHERE user_email = %s"
         quizzes_taken = self.db_manager.execute_query(quizzes_taken_query, (user_email,))[0][0]
 
         # Query to get the total questions answered
