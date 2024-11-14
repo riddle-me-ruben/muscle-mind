@@ -21,6 +21,12 @@ body {
     text-align: center;
 }
 
+.score {
+    font-size: 32px;
+    margin-bottom: 20px;
+    color: #00d1b2;
+}
+
 /* Big Go Back Symbol */
 .go-back-symbol {
     position: absolute;
