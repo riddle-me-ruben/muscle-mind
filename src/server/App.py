@@ -3,6 +3,7 @@ from DatabaseManager import DatabaseManager
 from QuizManager import QuizManager
 from UserManager import UserManager
 from DataAnalyticsManager import DataAnalyticsManager
+from QuizRetrievalManager import QuizRetrievalManager
 from dotenv import load_dotenv
 import os
 
@@ -37,6 +38,7 @@ class App:
         self.quiz_manager = QuizManager(self.db_manager)
         self.user_manager = UserManager(self.db_manager, session)
         self.analytics_manager = DataAnalyticsManager(self.db_manager)
+        self.quiz_retrieval_manager = QuizRetrievalManager(self.db_manager, self.analytics_manager)
 
         # Set up routes
         self.initialize_routes()
@@ -61,7 +63,9 @@ class App:
             ('/score/<int:quiz_id>/<int:score>/<int:total>', 'score_route', self.quiz_manager.score, ['GET']),
             ('/submit-answer/<int:quiz_id>/<int:question_num>', 'submit_quiz_answer_route', self.quiz_manager.submit_quiz_answer, ['POST']),
             ('/penalty/<int:quiz_id>/<int:question_num>', 'penalty_route', self.quiz_manager.penalty, ['GET']),
-            ('/delete-quiz/<int:quiz_id>', 'delete_quiz_route', self.quiz_manager.delete_quiz, ['POST'])
+            ('/delete-quiz/<int:quiz_id>', 'delete_quiz_route', self.quiz_manager.delete_quiz, ['POST']),
+            ('/view_other_user_quizzes', 'view_other_user_quizzes', self.quiz_retrieval_manager.view_other_user_quizzes, ['POST']),
+            ('/restore_user_quizzes', 'restore_user_quizzes', self.quiz_retrieval_manager.restore_user_quizzes, ['POST'])
         ]
 
         # Loop through route definitions to add them to the app
@@ -87,10 +91,16 @@ class App:
     def home(self):
         if not self.user_manager.is_signed_in():
             return redirect(url_for('login'))
-        
-        user_email = session['email']
-        quizzes = self.quiz_manager.get_user_quizzes(user_email)
-        analytics = self.analytics_manager.get_user_analytics()
+        # Check if there's an other_user_email in session; if so, show their quizzes
+        other_user_email = session.get('other_user_email')
+        if other_user_email:
+            quizzes = self.quiz_manager.get_user_quizzes(other_user_email)
+            analytics = None  # Do not show analytics for other user's quizzes
+        else:
+            session.pop('other_user_email', None)
+            user_email = session['email']
+            quizzes = self.quiz_manager.get_user_quizzes(user_email)
+            analytics = self.analytics_manager.get_user_analytics()    
         return render_template('home.html', quizzes=quizzes, analytics=analytics)
 
     """

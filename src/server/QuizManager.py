@@ -18,7 +18,7 @@ class QuizManager:
     """
     def __init__(self, db_manager):
         self.quiz_creation = QuizCreationManager(db_manager)
-        self.quiz_retrieval = QuizRetrievalManager(db_manager)
+        self.quiz_retrieval = QuizRetrievalManager(db_manager, None)
         self.quiz_submission = QuizSubmissionManager(db_manager, self.quiz_retrieval)
 
 

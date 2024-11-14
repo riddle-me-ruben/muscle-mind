@@ -1,4 +1,4 @@
-from flask import render_template
+from flask import render_template, request, session
 
 """
 The QuizRetrievalManager class handles retrieving quizzes and their details from the database.
@@ -12,8 +12,9 @@ class QuizRetrievalManager:
     @requires A valid DatabaseManager instance
     @ensures QuizRetrievalManager is ready to handle quiz fetching and detail retrieval
     """
-    def __init__(self, db_manager):
+    def __init__(self, db_manager, analytics_manager):
         self.db_manager = db_manager
+        self.analytics_manager = analytics_manager
 
     """
     Retrieve the quiz by its ID and construct the quiz data
@@ -129,3 +130,20 @@ class QuizRetrievalManager:
         
         quizzes = [{'quiz_id': row[0], 'title': row[1]} for row in result]
         return quizzes
+    
+    # TODO: Write comments
+    def view_other_user_quizzes(self):
+        # Get the other user's email from the form submission
+        other_user_email = request.form.get('other_user_email')
+        session['other_user_email'] = other_user_email  # Store other user's email in session
+        quizzes = self.get_user_quizzes(other_user_email)
+        analytics = None  # Do not show analytics for another user
+        return render_template('home.html', quizzes=quizzes, analytics=analytics)
+
+    def restore_user_quizzes(self):
+        session.pop('other_user_email', None)
+        # Fetch quizzes of the logged-in user
+        user_email = session['email']
+        quizzes = self.get_user_quizzes(user_email)
+        analytics = self.analytics_manager.get_user_analytics()
+        return render_template('home.html', quizzes=quizzes, analytics=analytics)
