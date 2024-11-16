@@ -8,13 +8,18 @@
     <link rel="icon" href="{{ url_for('static', filename='logo.png') }}" type="image/x-icon">
 </head>
 <body>
-
     <h1>Quiz Completed!</h1>
-    <p class = "score">Your score is: {{ score }} out of {{ total }}</p>
+    <p class="score">Your score is: {{ score }} out of {{ total }}</p>
 
-    <a href="{{ url_for('home') }}">
-        <button>Return to Home</button>
-    </a>
-
+    <!-- Conditional Redirection -->
+    {% if session.get('other_user_email') %}
+        <a href="{{ url_for('view_other_user_quizzes') }}">
+            <button>Return to {{ session.get('other_user_email') }}'s Quizzes</button>
+        </a>
+    {% else %}
+        <a href="{{ url_for('home') }}">
+            <button>Return to Home</button>
+        </a>
+    {% endif %}
 </body>
 </html>

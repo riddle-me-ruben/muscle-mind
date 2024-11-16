@@ -47,6 +47,15 @@
                     <label for="title">Quiz Title:</label>
                     <input type="text" id="title" name="title" placeholder="Enter quiz title" required>
                 </div>
+                
+                <div class="form-group">
+                    <label for="audio_file">Select Background Audio:</label>
+                    <select id="audio_file" name="audio_file" required>
+                        <option value="option1.mp3" selected>Option 1</option>
+                        <option value="option2.mp3">Option 2</option>
+                        <option value="option3.mp3">Option 3</option>
+                    </select>
+                </div>                
 
                 <button type="submit" class="btn btn-primary">Start Quiz Creation</button>
             </form>
@@ -58,6 +67,8 @@
         <section class="form-section">
             <form method="POST" action="{{ url_for('submit_quiz_route') }}" class="quiz-form">
                 <input type="hidden" name="title" value="{{ title }}">
+                <input type="hidden" name="num_questions" value="{{ num_questions }}">
+                <input type="hidden" name="audio_file" value="{{ audio_file }}"> <!-- Add this -->
 
                 {% for i in range(num_questions) %}
                 <div class="question">

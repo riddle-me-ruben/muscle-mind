@@ -151,3 +151,55 @@ input[type="radio"] {
         padding: 12px;
     }
 }
+
+
+/* Dropdown Styling */
+select {
+    width: 100%;
+    padding: 12px;
+    font-size: 1.2em;
+    border-radius: 8px;
+    border: 1px solid #bdc3c7;
+    background: linear-gradient(to bottom, #ecf0f1, #d5d8dc); /* Subtle gradient */
+    color: #2C3E50;
+    margin-top: 5px;
+    transition: all 0.3s ease;
+    appearance: none; /* Removes default browser styling */
+    cursor: pointer; /* Makes it clear it's interactive */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Adds a slight shadow for depth */
+}
+
+/* Dropdown Hover and Focus Styles */
+select:hover {
+    background: linear-gradient(to bottom, #d5d8dc, #ecf0f1); /* Reverse gradient on hover */
+    border-color: #1ABC9C; /* Matches primary button styling */
+}
+
+select:focus {
+    border-color: #16A085;
+    outline: none;
+    box-shadow: 0 0 10px rgba(26, 188, 156, 0.5); /* Add a subtle glow */
+}
+
+/* Dropdown Arrow Styling (Optional for Custom Look) */
+select::-ms-expand {
+    display: none; /* Hides default dropdown arrow in IE */
+}
+
+select::after {
+    content: "▼";
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2em;
+    color: #2C3E50;
+}
+
+/* Dropdown Option Styling */
+option {
+    background: #ecf0f1;
+    color: #2C3E50;
+    font-size: 1.1em;
+    padding: 10px;
+}

@@ -64,7 +64,7 @@ class App:
             ('/submit-answer/<int:quiz_id>/<int:question_num>', 'submit_quiz_answer_route', self.quiz_manager.submit_quiz_answer, ['POST']),
             ('/penalty/<int:quiz_id>/<int:question_num>', 'penalty_route', self.quiz_manager.penalty, ['GET']),
             ('/delete-quiz/<int:quiz_id>', 'delete_quiz_route', self.quiz_manager.delete_quiz, ['POST']),
-            ('/view_other_user_quizzes', 'view_other_user_quizzes', self.quiz_retrieval_manager.view_other_user_quizzes, ['POST']),
+            ('/view_other_user_quizzes', 'view_other_user_quizzes', self.quiz_retrieval_manager.view_other_user_quizzes, ['GET', 'POST']),
             ('/restore_user_quizzes', 'restore_user_quizzes', self.quiz_retrieval_manager.restore_user_quizzes, ['POST'])
         ]
 

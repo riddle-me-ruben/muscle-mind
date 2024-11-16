@@ -8,28 +8,32 @@
     <title>{{ quiz.title }} - Quiz Details</title>
 </head>
 <body>
+    
+    <h1>{{ quiz.title }}</h1>  <!-- Display the quiz title -->
+    
+    <div class="content-box">
+        <audio id="background-music" autoplay loop>
+            <source src="{{ url_for('static', filename=audio_file) }}" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+        <!-- Display the questions and options -->
+        {% for question in quiz.questions %}
+            <h2>{{ question.question }}</h2>  <!-- Display the question text -->
 
-<h1>{{ quiz.title }}</h1>  <!-- Display the quiz title -->
+            <ul>
+                <li>A: {{ question.options[0] }}</li>  <!-- Option 1 -->
+                <li>B: {{ question.options[1] }}</li>  <!-- Option 2 -->
+                <li>C: {{ question.options[2] }}</li>  <!-- Option 3 -->
+                <li>D: {{ question.options[3] }}</li>  <!-- Option 4 -->
+            </ul>
 
-<div class="content-box">
-    <!-- Display the questions and options -->
-    {% for question in quiz.questions %}
-        <h2>{{ question.question }}</h2>  <!-- Display the question text -->
+            <p>Correct Answer: {{ question.correct_option }}</p>  <!-- Display the correct option -->
+        {% endfor %}
+    </div>
 
-        <ul>
-            <li>A: {{ question.options[0] }}</li>  <!-- Option 1 -->
-            <li>B: {{ question.options[1] }}</li>  <!-- Option 2 -->
-            <li>C: {{ question.options[2] }}</li>  <!-- Option 3 -->
-            <li>D: {{ question.options[3] }}</li>  <!-- Option 4 -->
-        </ul>
-
-        <p>Correct Answer: {{ question.correct_option }}</p>  <!-- Display the correct option -->
-    {% endfor %}
-</div>
-
-<a href="{{ url_for('home') }}">
-    <button>Back to Home</button>
-</a>
+    <a href="{{ url_for('home') }}">
+        <button>Back to Home</button>
+    </a>
 
 </body>
 </html>

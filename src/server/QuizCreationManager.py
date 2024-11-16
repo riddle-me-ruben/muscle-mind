@@ -27,13 +27,11 @@ class QuizCreationManager:
                 flash("You have reached the maximum number of quizzes allowed (3).", "error")
                 return redirect(url_for('create_quiz_route'))
 
-            num_questions, title = self.get_quiz_details_from_form()
-            if not num_questions or not title:
-                flash("Please provide both the number of questions and the quiz title.", "error")
-                return redirect(url_for('create_quiz_route'))
+            num_questions, title, audio_file = self.get_quiz_details_from_form()
 
             num_questions = self.limit_questions(num_questions)
-            return self.render_quiz_creation_form(num_questions, title)
+
+            return self.render_quiz_creation_form(num_questions, title, audio_file=audio_file)
 
         return render_template('create-quiz.html')
 
@@ -46,8 +44,11 @@ class QuizCreationManager:
         if request.method == 'POST':
             title = request.form.get('title')
             user_email = session['email']
+            audio_file = request.form.get('audio_file', 'option1.mp3')  # Default audio if not provided
+
             questions = self.build_questions_from_form()
-            columns, values, placeholders = self.build_insert_query(questions, user_email, title)
+            columns, values, placeholders = self.build_insert_query(questions, user_email, title, audio_file)
+
             self.store_quiz_in_database(columns, values, placeholders)
             return redirect(url_for('home'))
 
@@ -70,7 +71,8 @@ class QuizCreationManager:
     def get_quiz_details_from_form(self):
         num_questions = request.form.get('num_questions')
         title = request.form.get('title')
-        return num_questions, title
+        audio_file = request.form.get('audio_file', 'option1.mp3')
+        return num_questions, title, audio_file
 
     """
     Limit the number of questions to a maximum of 10
@@ -89,8 +91,8 @@ class QuizCreationManager:
     @requires num_questions to be an integer and title to be a valid string
     @ensures Renders the form for creating the quiz with dynamically generated question fields
     """
-    def render_quiz_creation_form(self, num_questions, title):
-        return render_template('create-quiz.html', num_questions=num_questions, title=title)
+    def render_quiz_creation_form(self, num_questions, title, audio_file):
+        return render_template('create-quiz.html', num_questions=num_questions, title=title, audio_file=audio_file)
 
     """
     Build the questions list from the form data
@@ -99,17 +101,27 @@ class QuizCreationManager:
     """
     def build_questions_from_form(self):
         questions = []
-        num_questions = 10  # Assuming max 10 questions
+        num_questions = int(request.form.get('num_questions', 0))
+
         for i in range(num_questions):
-            question_text = request.form.get(f'question_text_{i}', None)
-            if question_text:
-                option1 = request.form.get(f'answer_{i}_1')
-                option2 = request.form.get(f'answer_{i}_2')
-                option3 = request.form.get(f'answer_{i}_3')
-                option4 = request.form.get(f'answer_{i}_4')
-                correct_answer = request.form.get(f'correct_answer_{i}')
-                questions.append((question_text, option1, option2, option3, option4, correct_answer))
+            # Fetch question-related fields
+            question_text = request.form.get(f'question_text_{i}')
+            option1 = request.form.get(f'answer_{i}_1')
+            option2 = request.form.get(f'answer_{i}_2')
+            option3 = request.form.get(f'answer_{i}_3')
+            option4 = request.form.get(f'answer_{i}_4')
+            correct_answer = request.form.get(f'correct_answer_{i}')
+
+            # Validate the presence of a valid question text
+            if not question_text or not option1 or not option2 or not option3 or not option4 or not correct_answer:
+                continue  # Skip invalid or incomplete questions
+
+            # Append only valid questions to the list
+            questions.append((question_text, option1, option2, option3, option4, correct_answer))
+
         return questions
+
+
 
     """
     Build the SQL query to insert the quiz into the database
@@ -119,21 +131,22 @@ class QuizCreationManager:
     @requires A valid list of questions, user_email, and title
     @ensures Returns the columns, values, and query placeholders for the SQL insert statement
     """
-    def build_insert_query(self, questions, user_email, title):
-        columns = ['user_email', 'title']
-        values = [user_email, title]
-        query_values_placeholders = '%s, %s'
+    def build_insert_query(self, questions, user_email, title, audio_file):
+        columns = ['user_email', 'title', 'audio_file']
+        values = [user_email, title, audio_file]
+        query_values_placeholders = '%s, %s, %s'
 
-        for i in range(len(questions)):
+        for i, question in enumerate(questions):
             question_idx = i + 1
             columns += [
                 f'question{question_idx}', f'option{question_idx}_1', f'option{question_idx}_2',
                 f'option{question_idx}_3', f'option{question_idx}_4', f'correct_option{question_idx}'
             ]
             query_values_placeholders += ', %s, %s, %s, %s, %s, %s'
-            values.extend(questions[i])
+            values.extend(question)
 
         return columns, values, query_values_placeholders
+
 
     """
     Store the created quiz in the database
