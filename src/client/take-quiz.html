@@ -43,5 +43,33 @@
     <button type="submit">Submit Answer</button>
 </form>
 
+<script>
+    // Get the audio element
+    const audio = document.getElementById('background-audio');
+
+    // Check if the quiz is ongoing and restore audio playback time
+    const quizInProgress = localStorage.getItem('quizInProgress');
+    if (quizInProgress === '{{ quiz_id }}') {
+        const savedTime = localStorage.getItem('audioTime');
+        if (savedTime) {
+            audio.currentTime = parseFloat(savedTime);
+        }
+    }
+
+    // Save the current audio time and quiz ID to localStorage before navigating away
+    window.addEventListener('beforeunload', () => {
+        localStorage.setItem('audioTime', audio.currentTime);
+        localStorage.setItem('quizInProgress', '{{ quiz_id }}');
+    });
+
+    // Clear audio progress if the user finishes the quiz
+    {% if question_num + 1 == quiz['questions']|length %}
+    window.addEventListener('beforeunload', () => {
+        localStorage.removeItem('audioTime');
+        localStorage.removeItem('quizInProgress');
+    });
+    {% endif %}
+</script>
+
 </body>
 </html>

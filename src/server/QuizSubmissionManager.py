@@ -30,6 +30,23 @@ class QuizSubmissionManager:
         if quiz is None:
             return "Quiz not found", 404
 
+        # Check if the current user is the creator
+        user_email = session.get('email')
+        print("Quiz in taking the quiz: ", quiz)
+        # Check if play count for this quiz has already been incremented in the current session
+        if f'quiz_{quiz_id}_played' not in session:
+            user_email = session.get('email')
+            if user_email == quiz['creator_email']:
+                update_query = "UPDATE quizzes SET creator_play_count = creator_play_count + 1 WHERE quiz_id = %s"
+            else:
+                update_query = "UPDATE quizzes SET user_play_count = user_play_count + 1 WHERE quiz_id = %s"
+
+            # Increment play count in the database
+            self.db_manager.execute_commit(update_query, (quiz_id,))
+
+            # Mark this quiz as played in the session
+            session[f'quiz_{quiz_id}_played'] = True
+
         if question_num >= len(quiz['questions']):
             return redirect(url_for('home'))
         return render_template('take-quiz.html', quiz=quiz, question_num=question_num, quiz_id=quiz_id)
@@ -56,6 +73,15 @@ class QuizSubmissionManager:
             if question_num + 1 < len(quiz['questions']):
                 return redirect(url_for('take_quiz_route', quiz_id=quiz_id, question_num=question_num + 1))
             else:
+                # Increment play count after the last question is answered
+                user_email = session.get('email')
+                if user_email == quiz['creator_email']:
+                    update_query = "UPDATE quizzes SET creator_play_count = creator_play_count + 1 WHERE quiz_id = %s"
+                else:
+                    update_query = "UPDATE quizzes SET user_play_count = user_play_count + 1 WHERE quiz_id = %s"
+
+                # Update the play count in the database
+                self.db_manager.execute_commit(update_query, (quiz_id,))
                 return redirect(url_for('score_route', quiz_id=quiz_id, score=session['current_score'], total=len(quiz['questions'])))
         else:
             return redirect(url_for('penalty_route', quiz_id=quiz_id, question_num=question_num))

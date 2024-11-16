@@ -49,14 +49,22 @@
         <!-- Conditional Heading for Quizzes -->
         {% if quizzes and quizzes|length > 0 %}
             {% if session.get('other_user_email') %}
-                <h2>Quizzes {{ session.get('other_user_email') }} has created:</h2>
+                <h2>You are viewing quizzes {{ session.get('other_user_email') }} has created</h2>
+                <h2>🏋️ {{ session.get('other_user_email') }}'s Gym 🏋️ </h2>
             {% else %}
-                <h2>Your Quizzes:</h2>
+                <h2>You are signed in as: {{ session.get('email') }} </h2>
+                <h2> 🏋️‍♂️ {{ session.get('email') }}'s Gym 🏋️‍♂️ </h2> 
             {% endif %}
             <ul>
                 {% for quiz in quizzes %}
                 <li class="quiz-item">
                     <span class="quiz-title">{{ quiz.title }}</span>
+
+                    <div class="quiz-play-stats">
+                        <p>🎮 Played by creator: {{ quiz.creator_play_count or 0}}</p>
+                        <p>👥 Played by others: {{ quiz.user_play_count or 0}}</p>
+                    </div>
+
                     <div class="button-group">
                         <a href="{{ url_for('quiz_detail_route', quiz_id=quiz['quiz_id'], audio_file=quiz['audio_file']) }}" class="view-quiz-button">View</a>
                         <a href="{{ url_for('take_quiz_route', quiz_id=quiz['quiz_id'], question_num=0) }}" class="take-quiz-button">Take</a>
@@ -72,7 +80,7 @@
                 {% endfor %}
             </ul>
         {% else %}
-        <button style="text-align: center;" class="no-quiz-button">No quizzes available</button>
+        <button style="text-align: center;" class="no-quiz-button">😢 No quizzes available. Why not create one?</button>
         {% endif %}
 
         <a href="{{ url_for('logout') }}">

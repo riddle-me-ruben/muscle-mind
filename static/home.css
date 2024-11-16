@@ -24,7 +24,7 @@ body {
 }
 
 /* Header styling */
-h1 {
+h1,h2 {
     font-size: 54px;
     margin-bottom: 45px;
     color: #00d1b2;
@@ -232,66 +232,6 @@ ul {
     margin-bottom: 20px; /* Add spacing below the control */
 }
 
-/* Style for the audio icon */
-.audio-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%; /* Makes the icon circular */
-    cursor: pointer; /* Pointer cursor for interactivity */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Adds a shadow to the icon */
-    transition: transform 0.2s, box-shadow 0.2s; /* Smooth hover effect */
-}
-
-/* Hover effect for the audio icon */
-.audio-icon:hover {
-    transform: scale(1.1); /* Slightly enlarges the icon on hover */
-    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3); /* Enhanced shadow on hover */
-}
-
-/* Style for the volume slider */
-#volume-slider {
-    appearance: none; /* Remove default browser styles */
-    width: 200px; /* Adjust slider width */
-    height: 8px;
-    background: linear-gradient(to right, #00d1b2, #4A90E2); /* Gradient for the slider */
-    border-radius: 5px; /* Smooth edges */
-    outline: none;
-    cursor: pointer; /* Pointer cursor for interactivity */
-    transition: background 0.2s; /* Smooth transition for slider */
-}
-
-/* Custom thumb styling for the slider */
-#volume-slider::-webkit-slider-thumb {
-    appearance: none; /* Remove default browser styles */
-    width: 16px;
-    height: 16px;
-    border-radius: 50%; /* Circular thumb */
-    background: #ffffff; /* White thumb */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* Subtle shadow for the thumb */
-    cursor: pointer; /* Pointer cursor */
-    transition: transform 0.2s; /* Smooth transition on hover */
-}
-
-#volume-slider::-webkit-slider-thumb:hover {
-    transform: scale(1.7); /* Enlarge thumb on hover */
-}
-
-#volume-slider::-moz-range-thumb {
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background: #ffffff;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    cursor: pointer;
-    transition: transform 0.2s;
-}
-
-#volume-slider::-moz-range-thumb:hover {
-    transform: scale(1.7);
-}
-
-
-
 /* Responsive design for smaller screens */
 @media (max-width: 650px) {
     button,
@@ -309,4 +249,23 @@ ul {
     .quiz-title {
         font-size: 2.4em;
     }
+}
+
+.quiz-play-stats p {
+    font-size: 1.5em; /* Larger text for emphasis */
+    font-weight: bold; /* Bold text for importance */
+    margin: 10px 0; /* Add spacing between the stats */
+    padding: 10px; /* Padding inside the container */
+    background-color: #2c2f38; /* Dark background for contrast */
+    border-radius: 10px; /* Rounded corners for smooth look */
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3); /* Add some depth with shadow */
+    color: #00d1b2; /* Vibrant text color */
+    text-align: center; /* Center-align the text */
+    transition: transform 0.3s ease, background-color 0.3s ease; /* Smooth hover effects */
+}
+
+.quiz-play-stats p:hover {
+    transform: scale(1.05); /* Slight zoom effect on hover */
+    background-color: #00b89a; /* Change background on hover */
+    color: #ffffff; /* White text on hover for contrast */
 }

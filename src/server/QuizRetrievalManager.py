@@ -1,10 +1,5 @@
 from flask import render_template, request, session
 
-"""
-The QuizRetrievalManager class handles retrieving quizzes and their details from the database.
-@requires A valid DatabaseManager for fetching quiz data
-@ensures Quiz information is retrieved and processed for display, ensuring accurate data retrieval from the database
-"""
 class QuizRetrievalManager:
     """
     Initialize the QuizRetrievalManager with a database manager
@@ -32,30 +27,51 @@ class QuizRetrievalManager:
         delete_quiz_query = "DELETE FROM quizzes WHERE quiz_id = %s AND user_email = %s"
         self.db_manager.execute_commit(delete_quiz_query, (quiz_id, user_email))
 
-
     """
-    Fetch the quiz by its ID and construct the quiz data
+    Retrieve the quiz by its ID and construct the quiz data
     quiz_id: int - The ID of the quiz
     @requires A valid quiz_id and database connection
-    @ensures The quiz data is returned including its questions and title
+    @ensures The quiz data is returned including its title, audio file, play counts, and questions
     """
     def get_quiz_by_id(self, quiz_id):
         quiz = self.fetch_quiz(quiz_id)
         if not quiz:
             return None
 
-        questions = self.build_questions(quiz)
-        return {'title': quiz[0][0], 'audio_file': quiz[0][1], 'questions': questions}
+        # Map the database fields to a dictionary
+        fields = [
+            'title', 'audio_file', 'creator_play_count', 'user_play_count', 'user_email'
+        ]
+        # Add dynamic fields for questions and options
+        for i in range(1, 11):  # Max 10 questions
+            fields.extend([
+                f'question{i}', f'option{i}_1', f'option{i}_2',
+                f'option{i}_3', f'option{i}_4', f'correct_option{i}'
+            ])
+
+        quiz_data = {fields[i]: quiz[0][i] for i in range(len(fields))}
+        questions = self.build_questions(quiz_data)
+        
+        return {
+            'title': quiz_data['title'],
+            'audio_file': quiz_data['audio_file'],
+            'creator_play_count': quiz_data['creator_play_count'],
+            'user_play_count': quiz_data['user_play_count'],
+            'creator_email': quiz_data['user_email'],
+            'questions': questions
+        }
 
     """
-    Retrieve quiz details from the database by its ID
+    Fetch the quiz by its ID
     quiz_id: int - The ID of the quiz
     @requires A valid quiz_id and database connection
-    @ensures The quiz is fetched from the database
+    @ensures The raw quiz data is fetched from the database
     """
     def fetch_quiz(self, quiz_id):
         quiz_query, params = self.build_quiz_query(quiz_id)
+        print(f"Quiz Query: {quiz_query}")
         quiz = self.db_manager.execute_query(quiz_query, params)
+        print("Returned quiz", quiz)
         return quiz
 
     """
@@ -65,44 +81,44 @@ class QuizRetrievalManager:
     @ensures A dynamic SQL query is built to fetch the quiz data
     """
     def build_quiz_query(self, quiz_id):
-        columns = ['title', 'audio_file']
+        columns = ['title', 'audio_file', 'creator_play_count', 'user_play_count', 'user_email']
         num_questions = 10
 
         for i in range(num_questions):
             question_idx = i + 1
-            columns += [
+            columns.extend([
                 f'question{question_idx}', f'option{question_idx}_1', f'option{question_idx}_2',
                 f'option{question_idx}_3', f'option{question_idx}_4', f'correct_option{question_idx}'
-            ]
+            ])
 
         query = f"SELECT {', '.join(columns)} FROM quizzes WHERE quiz_id = %s"
         return query, (quiz_id,)
 
     """
-    Build a list of questions from the fetched quiz result
-    quiz: tuple - The quiz data fetched from the database
+    Build a list of questions from the quiz data
+    quiz_data: dict - The quiz data fetched from the database
     @requires Valid quiz data containing questions and options
     @ensures A list of questions with their options and correct answers is built
     """
-    def build_questions(self, quiz):
-        """Build the list of questions from the quiz result."""
+    def build_questions(self, quiz_data):
+        """Build the list of questions from the quiz data."""
         num_questions = 10
         questions = []
 
-        for i in range(num_questions):
-            question_idx = 2 + i * 6  # Calculate the starting index for each question block
-            if quiz[0][question_idx]:
+        for i in range(1, num_questions + 1):
+            question_key = f'question{i}'
+            if quiz_data.get(question_key):
                 questions.append({
-                    'question': quiz[0][question_idx],
+                    'question': quiz_data[question_key],
                     'options': [
-                        quiz[0][question_idx + 1],
-                        quiz[0][question_idx + 2],
-                        quiz[0][question_idx + 3],
-                        quiz[0][question_idx + 4]
+                        quiz_data.get(f'option{i}_1'),
+                        quiz_data.get(f'option{i}_2'),
+                        quiz_data.get(f'option{i}_3'),
+                        quiz_data.get(f'option{i}_4')
                     ],
-                    'correct_option': quiz[0][question_idx + 5]
+                    'correct_option': quiz_data.get(f'correct_option{i}')
                 })
-
+        print(questions)
         return questions
 
     """
@@ -115,7 +131,9 @@ class QuizRetrievalManager:
         quiz = self.get_quiz_by_id(quiz_id)
         if not quiz:
             return "Quiz not found", 404
-        audio_file = f"media/{quiz.get('audio_file', 'option1.mp3')}"  # Default to media/option1.mp3 if not set
+        audio_file = f"/static/media/{quiz.get('audio_file', 'option1.mp3')}"
+
+        print(f"Audio File in quiz_detail: {audio_file}")
 
         return render_template('quiz-detail.html', quiz=quiz, audio_file=audio_file)
 
@@ -126,13 +144,14 @@ class QuizRetrievalManager:
     @ensures The quizzes created by the user are returned
     """
     def get_user_quizzes(self, user_email):
-        query = "SELECT quiz_id, title, audio_file FROM quizzes WHERE user_email = %s"
+        query = "SELECT quiz_id, title, audio_file, creator_play_count, user_play_count FROM quizzes WHERE user_email = %s"
         result = self.db_manager.execute_query(query, (user_email,))
         
-        quizzes = [{'quiz_id': row[0], 'title': row[1], 'audio_file': row[2]} for row in result]
+        quizzes = [{'quiz_id': row[0], 'title': row[1], 'audio_file': row[2], 'creator_play_count': row[3], 'user_play_count': row[4]} for row in result]
+        print("Quizzes in get_user_quizzes", quizzes)
         return quizzes
-    
-    # TODO: Write comments
+
+    # TODO: Add comments
     def view_other_user_quizzes(self):
         other_user_email = session.get('other_user_email', request.form.get('other_user_email'))
         if other_user_email:
