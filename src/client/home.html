@@ -47,7 +47,12 @@
         </a>
 
         {% if quizzes and quizzes|length > 0 %}
-        <h2>Your Quizzes:</h2>
+        <!-- Conditional Heading -->
+        {% if other_user_email %}
+            <h2>Quizzes {{ other_user_email }} has created:</h2>
+        {% else %}
+            <h2>Your Quizzes:</h2>
+        {% endif %}
         <ul>
             {% for quiz in quizzes %}
                 <li class="quiz-item">
@@ -56,7 +61,7 @@
                         <a href="{{ url_for('quiz_detail_route', quiz_id=quiz['quiz_id']) }}" class="view-quiz-button">View</a>
                         <a href="{{ url_for('take_quiz_route', quiz_id=quiz['quiz_id'], question_num=0) }}" class="take-quiz-button">Take</a>
                         
-                        {% if not session.get('other_user_email') %}
+                        {% if not other_user_email %}
                             <!-- Only show the delete button if viewing own quizzes -->
                             <form action="{{ url_for('delete_quiz_route', quiz_id=quiz['quiz_id']) }}" method="post" style="display: inline;">
                                 <button type="submit" class="delete-quiz-button" onclick="return confirm('Are you sure you want to delete this quiz?');">Delete</button>
@@ -67,7 +72,7 @@
             {% endfor %}
         </ul>
         {% else %}
-        <button style="text-align: center;" class="no-quiz-button">No quizzes available.</button>
+        <button style="text-align: center;" class="no-quiz-button">No quizzes available</button>
         {% endif %}
 
         <a href="{{ url_for('logout') }}">

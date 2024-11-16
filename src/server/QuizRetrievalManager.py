@@ -138,7 +138,7 @@ class QuizRetrievalManager:
         session['other_user_email'] = other_user_email  # Store other user's email in session
         quizzes = self.get_user_quizzes(other_user_email)
         analytics = None  # Do not show analytics for another user
-        return render_template('home.html', quizzes=quizzes, analytics=analytics)
+        return render_template('home.html', quizzes=quizzes, analytics=analytics, other_user_email=other_user_email)
 
     def restore_user_quizzes(self):
         session.pop('other_user_email', None)
