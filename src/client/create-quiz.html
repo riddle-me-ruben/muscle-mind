@@ -41,32 +41,38 @@ Create a Quiz
                 <input type="number" id="num_questions" name="num_questions" min="1" max="10" required>
             </div>
 
-                <div class="form-group">
-                    <label for="title">Quiz Title:</label>
-                    <input type="text" id="title" name="title" placeholder="Enter quiz title" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="audio_file">Select Background Audio:</label>
-                    <select id="audio_file" name="audio_file" required>
-                        <option value="option1.mp3" selected>Option 1</option>
-                        <option value="option2.mp3">Option 2</option>
-                        <option value="option3.mp3">Option 3</option>
-                    </select>
-                </div>                
+            <div class="form-group">
+                <label for="title">Quiz Title:</label>
+                <input type="text" id="title" name="title" placeholder="Enter quiz title" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="audio_file">Select Background Audio:</label>
+                <select id="audio_file" name="audio_file" required>
+                    <option value="media/option1.mp3" selected>Option 1</option>
+                    <option value="media/option2.mp3">Option 2</option>
+                    <option value="media/option3.mp3">Option 3</option>
+                </select>
+            </div>
 
-                <button type="submit" class="btn btn-primary">Start Quiz Creation</button>
-            </form>
-        </section>
-        {% endif %}
+            <!-- Audio player for preview -->
+            <audio id="audio-preview" autoplay>
+                <source src="{{ url_for('static', filename='media/option1.mp3') }}" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
 
-        <!-- Form to input questions and answers dynamically after selecting num_questions -->
-        {% if num_questions %}
-        <section class="form-section">
-            <form method="POST" action="{{ url_for('submit_quiz_route') }}" class="quiz-form">
-                <input type="hidden" name="title" value="{{ title }}">
-                <input type="hidden" name="num_questions" value="{{ num_questions }}">
-                <input type="hidden" name="audio_file" value="{{ audio_file }}"> <!-- Add this -->
+            <button type="submit" class="btn btn-primary">Start Quiz Creation</button>
+        </form>
+    </section>
+    {% endif %}
+
+    <!-- Form to input questions and answers dynamically after selecting num_questions -->
+    {% if num_questions %}
+    <section class="form-section">
+        <form method="POST" action="{{ url_for('submit_quiz_route') }}" class="quiz-form">
+            <input type="hidden" name="title" value="{{ title }}">
+            <input type="hidden" name="num_questions" value="{{ num_questions }}">
+            <input type="hidden" name="audio_file" value="{{ audio_file }}"> <!-- Add this -->
 
             {% for i in range(num_questions) %}
             <div class="question">
@@ -119,5 +125,21 @@ Create a Quiz
 {% endblock %}
 
 {% block extra_js %}
-<script src="/static/create-quiz.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const audioSelect = document.getElementById('audio_file');
+        const audioPreview = document.getElementById('audio-preview');
+
+        // Listen for changes in the dropdown menu
+        audioSelect.addEventListener('change', (event) => {
+            const selectedAudio = event.target.value;
+
+            // Update the audio preview's source
+            const sourceElement = audioPreview.querySelector('source');
+            sourceElement.src = `/static/${selectedAudio}`;
+            audioPreview.load(); // Reload the audio element to reflect the change
+            audioPreview.play(); // Start playing the selected audio
+        });
+    });
+</script>
 {% endblock %}
