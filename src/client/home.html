@@ -1,13 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+{% extends "music_base.html" %}
+
+{% block title %}
+    Home
+{% endblock %}
+
+{% block head %}
     <link rel="stylesheet" href="/static/home.css">
     <link rel="icon" href="{{ url_for('static', filename='logo.png') }}" type="image/x-icon">
-</head>
-<body>
+{% endblock %}
+
+{% block content %}
     <div class="container">
         <h1>Welcome to Muscle Mind!</h1>
         
@@ -103,41 +105,4 @@
             <button class="logout-button">Log Out</button>
         </a>
     </div>
-
-    <script>
-        // Audio control logic
-        const audio = document.getElementById('background-music');
-        const slider = document.getElementById('volume-slider');
-        const icon = document.getElementById('audio-icon');
-        const audioOnIcon = "{{ url_for('static', filename='audio-on.png') }}";
-        const audioOffIcon = "{{ url_for('static', filename='audio-off.png') }}";
-
-        function toggleMute() {
-            if (audio.volume > 0) {
-                slider.value = 0;
-                audio.volume = 0;
-                icon.src = audioOffIcon;
-            } else {
-                slider.value = 1;
-                audio.volume = 1;
-                icon.src = audioOnIcon;
-            }
-        }
-
-        function adjustVolume() {
-            audio.volume = slider.value;
-            icon.src = audio.volume === 0 ? audioOffIcon : audioOnIcon;
-        }
-
-        audio.addEventListener('timeupdate', () => {
-            localStorage.setItem('audioTime', audio.currentTime);
-        });
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const savedTime = localStorage.getItem('audioTime');
-            if (savedTime) audio.currentTime = parseFloat(savedTime);
-            slider.value = audio.volume;
-        });
-    </script>
-</body>
-</html>
+{% endblock %}

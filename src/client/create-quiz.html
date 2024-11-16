@@ -1,47 +1,45 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "music_base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create a Quiz</title>
-    <link rel="stylesheet" href="/static/create-quiz.css">
-    <link rel="icon" href="{{ url_for('static', filename='logo.png') }}" type="image/x-icon">
-</head>
+{% block title %}
+Create a Quiz
+{% endblock %}
 
-<body>
+{% block head %}
+<link rel="stylesheet" href="/static/create-quiz.css">
+<link rel="icon" href="{{ url_for('static', filename='logo.png') }}" type="image/x-icon">
+{% endblock %}
 
-    <!-- Main container -->
-    <div class="container">
+{% block content %}
+<div class="container">
 
-        <!-- Flash messages section -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        <div class="flash-message-container">
-            <ul class="flash-message">
-            {% for category, message in messages %}
-                <li class="{{ category }}">{{ message }}</li>
-            {% endfor %}
-            </ul>
-        </div>
-        {% endif %}
-        {% endwith %}
+    <!-- Flash messages section -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-message-container">
+        <ul class="flash-message">
+        {% for category, message in messages %}
+            <li class="{{ category }}">{{ message }}</li>
+        {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+    {% endwith %}
 
-        <h1>Create a New Quiz</h1>
+    <h1>Create a New Quiz</h1>
 
-        <!-- Button to return to home page -->
-        <a href="{{ url_for('home') }}">
-            <button class="btn btn-back">Return to Home</button>
-        </a>
+    <!-- Button to return to home page -->
+    <a href="{{ url_for('home') }}">
+        <button class="btn btn-back">Return to Home</button>
+    </a>
 
-        <!-- Form to input number of questions and quiz title (only shown if num_questions is not set) -->
-        {% if not num_questions %}
-        <section class="form-section">
-            <form method="POST" action="{{ url_for('create_quiz_route') }}" class="quiz-form">
-                <div class="form-group">
-                    <label for="num_questions">How many questions do you want to create? (max 10)</label>
-                    <input type="number" id="num_questions" name="num_questions" min="1" max="10" required>
-                </div>
+    <!-- Form to input number of questions and quiz title (only shown if num_questions is not set) -->
+    {% if not num_questions %}
+    <section class="form-section">
+        <form method="POST" action="{{ url_for('create_quiz_route') }}" class="quiz-form">
+            <div class="form-group">
+                <label for="num_questions">How many questions do you want to create? (max 10)</label>
+                <input type="number" id="num_questions" name="num_questions" min="1" max="10" required>
+            </div>
 
                 <div class="form-group">
                     <label for="title">Quiz Title:</label>
@@ -70,79 +68,56 @@
                 <input type="hidden" name="num_questions" value="{{ num_questions }}">
                 <input type="hidden" name="audio_file" value="{{ audio_file }}"> <!-- Add this -->
 
-                {% for i in range(num_questions) %}
-                <div class="question">
-                    <fieldset>
-                        <legend>Question {{ i+1 }}:</legend>
+            {% for i in range(num_questions) %}
+            <div class="question">
+                <fieldset>
+                    <legend>Question {{ i+1 }}:</legend>
 
-                        <div class="form-group">
-                            <label for="question_text_{{ i }}">Question Text:</label>
-                            <input type="text" name="question_text_{{ i }}" id="question_text_{{ i }}" placeholder="Enter your question" required>
+                    <div class="form-group">
+                        <label for="question_text_{{ i }}">Question Text:</label>
+                        <input type="text" name="question_text_{{ i }}" id="question_text_{{ i }}" placeholder="Enter your question" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="answer_{{ i }}_1">Option 1:</label>
+                        <input type="text" name="answer_{{ i }}_1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="answer_{{ i }}_2">Option 2:</label>
+                        <input type="text" name="answer_{{ i }}_2" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="answer_{{ i }}_3">Option 3:</label>
+                        <input type="text" name="answer_{{ i }}_3" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="answer_{{ i }}_4">Option 4:</label>
+                        <input type="text" name="answer_{{ i }}_4" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Correct Answer:</label>
+                        <div class="radio-group">
+                            <input type="radio" name="correct_answer_{{ i }}" value="A" required> A
+                            <input type="radio" name="correct_answer_{{ i }}" value="B"> B
+                            <input type="radio" name="correct_answer_{{ i }}" value="C"> C
+                            <input type="radio" name="correct_answer_{{ i }}" value="D"> D
                         </div>
+                    </div>
+                </fieldset>
+            </div>
+            {% endfor %}
 
-                        <div class="form-group">
-                            <label for="answer_{{ i }}_1">Option 1:</label>
-                            <input type="text" name="answer_{{ i }}_1" required>
-                        </div>
+            <button type="submit" class="btn btn-primary">Create Quiz</button>
+        </form>
+    </section>
+    {% endif %}
+</div>
+{% endblock %}
 
-                        <div class="form-group">
-                            <label for="answer_{{ i }}_2">Option 2:</label>
-                            <input type="text" name="answer_{{ i }}_2" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="answer_{{ i }}_3">Option 3:</label>
-                            <input type="text" name="answer_{{ i }}_3" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="answer_{{ i }}_4">Option 4:</label>
-                            <input type="text" name="answer_{{ i }}_4" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Correct Answer:</label>
-                            <div class="radio-group">
-                                <input type="radio" name="correct_answer_{{ i }}" value="A" required> A
-                                <input type="radio" name="correct_answer_{{ i }}" value="B"> B
-                                <input type="radio" name="correct_answer_{{ i }}" value="C"> C
-                                <input type="radio" name="correct_answer_{{ i }}" value="D"> D
-                            </div>
-                        </div>
-                    </fieldset>
-                </div>
-                {% endfor %}
-
-                <button type="submit" class="btn btn-primary">Create Quiz</button>
-            </form>
-        </section>
-        {% endif %}
-
-    </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const inputs = document.querySelectorAll('.form-group input');
-            
-            inputs.forEach(input => {
-                input.addEventListener('input', debounce(function() {
-                    // Handle form data or other operations here
-                }, 300)); // Debounce time is set to 300ms
-            });
-        });
-        
-        // Debounce function to limit how often an event is triggered
-        function debounce(func, wait) {
-            let timeout;
-            return function () {
-                const context = this;
-                const args = arguments;
-                clearTimeout(timeout);
-                timeout = setTimeout(() => func.apply(context, args), wait);
-            };
-        }
-        
-    </script>
-
-</body>
-
-</html>
+{% block extra_js %}
+<script src="/static/create-quiz.js"></script>
+{% endblock %}
