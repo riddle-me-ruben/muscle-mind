@@ -1,5 +1,8 @@
 import os
 import sys
+import pytest
+
+# Add the server directory to the system path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../server')))
 from App import App
 
@@ -7,327 +10,267 @@ from App import App
 app_instance = App()
 app = app_instance.app
 
-# Sample email for testing purposes (change for new account)
+# Sample email for testing purposes
 sample_email = 'test1@example.com'
 
 """
-@requires The user is not signed in.
-@ensures The index route renders the index page.
+Description:
+This function sets up a Flask test client for the application. A test client allows the simulation of HTTP requests
+to the Flask server without requiring it to be run in a production environment. The `with` statement ensures that 
+the test client is properly initialized and cleaned up after use. It enables the test functions to send requests 
+and verify responses without needing an actual running server.
+
+Semi-formal Notation:
+/*@ requires The Flask application is initialized and configured correctly;
+  @ ensures A test client is yielded, allowing HTTP requests to be made directly to the application;
+@*/
 """
-def test_index():
-    """
-    Test the index route to ensure it renders the index page when no user is signed in.
-    Prints a success message if the test passes.
-    """
+@pytest.fixture
+def client():
+    """Fixture to set up a Flask test client."""
     with app.test_client() as client:
-        try:
-            response = client.get('/')
-            if isinstance(response.data, bytes):
-                print("Index route test passed")
-            else:
-                print("Index route test failed (response is not bytes)")
-        except Exception as e:
-            print(f"Index route test failed with error: {str(e)}")
-
+        yield client
 
 """
-@requires The user is either signed in or not signed in.
-@ensures The home route renders correctly based on the user's sign-in state.
+Description:
+This function sets up a Flask test client and logs in a mock user by adding an "email" key to the session. It 
+simulates the state of a signed-in user for test cases that require an authenticated session. The email used is 
+a sample value (`sample_email`), which represents the signed-in user's identifier. Like the `client` fixture, the 
+`with` statement ensures proper resource cleanup.
+
+Semi-formal Notation:
+/*@ requires The Flask application is initialized and configured correctly &&
+  @ `sample_email` is defined and represents a valid email address
+  @ ("a <= email[i] <= z || A <= email[i] <= Z" + "@" + domain.com);
+  @ ensures A test client with a session containing "email" set to `sample_email` is yielded, simulating a logged-in user;
+@*/
 """
-def test_home():
-    """
-    Test the home route to ensure it renders or redirects.
-    Prints a success message if the test passes.
-    """
-    with app.test_client() as client:
-        try:
-            # When the user is not signed in
-            with client.session_transaction() as sess:
-                sess['email'] = None
-            response = client.get('/home')
-            if isinstance(response.data, bytes):
-                print("Home route test (not signed in) passed")
-            else:
-                print("Home route test (not signed in) failed (response is not bytes)")
-
-            # When the user is signed in
-            with client.session_transaction() as sess:
-                sess['email'] = sample_email
-            response = client.get('/home')
-            if isinstance(response.data, bytes):
-                print("Home route test (signed in) passed")
-            else:
-                print("Home route test (signed in) failed (response is not bytes)")
-        except Exception as e:
-            print(f"Home route test failed with error: {str(e)}")
-
+@pytest.fixture
+def logged_in_client(client):
+    """Fixture to log in a test user."""
+    with client.session_transaction() as sess:
+        sess['email'] = sample_email
+    yield client
 
 """
-@requires Valid user credentials (email and password).
-@ensures A new user is added to the system.
-"""
-def test_add_user():
-    """
-    Test the add_user route to ensure a user can be added.
-    Prints a success message if the test passes.
-    """
-    with app.test_client() as client:
-        try:
-            data = {'email': sample_email, 'password': 'newpass'}  # Changed to use sample_email
-            response = client.post('/add_user', data=data)
-            if isinstance(response.data, bytes):
-                print("Add user route test passed")
-            else:
-                print("Add user route test failed (response is not bytes)")
-        except Exception as e:
-            print(f"Add user route test failed with error: {str(e)}")
+Description:
+The Flask application server must be running and properly configured, allowing HTTP requests to be processed. 
+The session should not contain an "email" key, indicating no user is currently signed in. The test ensures 
+that the index page is rendered for a non-authenticated user.
 
+Semi-formal Notation:
+/*@ requires The server is running &&
+  @ session does not contain an "email" key (session["email"] == None);
+  @ ensures response.data is of type bytes &&
+  @ response contains the content of the index page;
+@*/
+"""
+def test_index(client):
+    response = client.get('/')
+    assert isinstance(response.data, bytes), "Index route response should be bytes."
 
 """
-@requires A valid user attempting to log in.
-@ensures The user successfully logs in.
-"""
-def test_login():
-    """
-    Test the login route to ensure login works correctly.
-    Prints a success message if the test passes.
-    """
-    with app.test_client() as client:
-        try:
-            response = client.get('/login')
-            if isinstance(response.data, bytes):
-                print("Login route test passed")
-            else:
-                print("Login route test failed (response is not bytes)")
-        except Exception as e:
-            print(f"Login route test failed with error: {str(e)}")
+Description:
+The server must be running, with all dependencies loaded and the "/home" route properly defined. The session 
+can either be empty (indicating no user is signed in) or contain a valid email in the format 
+("a <= email[i] <= z || A <= email[i] <= Z" + "@" + domain.com). The test ensures the "/home" route displays 
+the correct content based on the sign-in state.
 
-
+Semi-formal Notation:
+/*@ requires The server is running &&
+  @ (session["email"] == None || session["email"] matches the format
+  @ ("a <= email[i] <= z || A <= email[i] <= Z" + "@" + domain.com));
+  @ ensures If session["email"] == None:
+  @   response.data is of type bytes &&
+  @   response contains the guest home page;
+  @ otherwise:
+  @   response.data is of type bytes &&
+  @   response contains the user-specific home page;
+@*/
 """
-@requires A user is logged in.
-@ensures The user is successfully logged out.
-"""
-def test_logout():
-    """
-    Test the logout route to ensure user is logged out.
-    Prints a success message if the test passes.
-    """
-    with app.test_client() as client:
-        try:
-            with client.session_transaction() as sess:
-                sess['email'] = sample_email
-            response = client.get('/logout')
-            if isinstance(response.data, bytes):
-                print("Logout route test passed")
-            else:
-                print("Logout route test failed (response is not bytes)")
-        except Exception as e:
-            print(f"Logout route test failed with error: {str(e)}")
+def test_home(client):
+    # When the user is not signed in
+    with client.session_transaction() as sess:
+        sess['email'] = None
+    response = client.get('/home')
+    assert isinstance(response.data, bytes), "Home route response should be bytes when not signed in."
 
+    # When the user is signed in
+    with client.session_transaction() as sess:
+        sess['email'] = sample_email
+    response = client.get('/home')
+    assert isinstance(response.data, bytes), "Home route response should be bytes when signed in."
 
 """
-@requires A logged-in user and valid quiz data.
-@ensures A quiz is created and stored in the system.
-"""
-def test_create_quiz():
-    """
-    Test the create quiz route to ensure quizzes can be created.
-    Prints a success message if the test passes.
-    """
-    with app.test_client() as client:
-        try:
-            with client.session_transaction() as sess:
-                sess['email'] = sample_email
-            data = {'title': 'Sample Quiz', 'questions': []}
-            response = client.post('/create-quiz', data=data)
-            if isinstance(response.data, bytes):
-                print("Create quiz route test passed")
-            else:
-                print("Create quiz route test failed (response is not bytes)")
-        except Exception as e:
-            print(f"Create quiz route test failed with error: {str(e)}")
+Description:
+The Flask application server must be running and connected to a database capable of storing user data. The 
+provided email must match the format ("a <= email[i] <= z || A <= email[i] <= Z" + "@" + domain.com), and the 
+password must be a non-empty string. The test ensures a new user is successfully added to the database.
 
+Semi-formal Notation:
+/*@ requires The server is running &&
+  @ email matches the format ("a <= email[i] <= z || A <= email[i] <= Z" + "@" + domain.com) &&
+  @ password is a non-empty string (password != "");
+  @ ensures response.data is of type bytes &&
+  @ a new user with the given email and password is added to the database;
+@*/
+"""
+def test_add_user(client):
+    data = {'email': sample_email, 'password': 'newpass'}
+    response = client.post('/add_user', data=data)
+    assert isinstance(response.data, bytes), "Add user route response should be bytes."
 
 """
-@requires The user has completed the quiz and is submitting answers.
-@ensures The quiz submission is processed and stored.
-"""
-def test_submit_quiz():
-    """
-    Test the submit quiz route to ensure quizzes can be submitted.
-    Prints a success message if the test passes.
-    """
-    with app.test_client() as client:
-        try:
-            with client.session_transaction() as sess:
-                sess['email'] = sample_email
-            data = {'answers': ['A', 'B', 'C']}
-            response = client.post('/submit-quiz', data=data)
-            if isinstance(response.data, bytes):
-                print("Submit quiz route test passed")
-            else:
-                print("Submit quiz route test failed (response is not bytes)")
-        except Exception as e:
-            print(f"Submit quiz route test failed with error: {str(e)}")
+Description:
+The server must be active, and the "/login" route must be properly defined to handle GET requests. The route 
+should render the login page and return its content as bytes.
 
+Semi-formal Notation:
+/*@ requires The server is running &&
+  @ the "/login" route is defined;
+  @ ensures response.data is of type bytes &&
+  @ response contains the content of the login page;
+@*/
+"""
+def test_login(client):
+    response = client.get('/login')
+    assert isinstance(response.data, bytes), "Login route response should be bytes."
 
 """
-@requires A valid quiz ID.
-@ensures The details of the quiz are retrieved.
-"""
-def test_quiz_detail():
-    """
-    Test the quiz detail route to ensure quiz details can be retrieved.
-    Prints a success message if the test passes.
-    """
-    with app.test_client() as client:
-        try:
-            response = client.get('/quiz/1')
-            if isinstance(response.data, bytes):
-                print("Quiz detail route test passed")
-            else:
-                print("Quiz detail route test failed (response is not bytes)")
-        except Exception as e:
-            print(f"Quiz detail route test failed with error: {str(e)}")
+Description:
+The server must be running, and the session must include a valid email matching the format 
+("a <= email[i] <= z || A <= email[i] <= Z" + "@" + domain.com). The test ensures that the logout route clears 
+the session and logs the user out successfully.
 
+Semi-formal Notation:
+/*@ requires The server is running &&
+  @ session["email"] matches the format ("a <= email[i] <= z || A <= email[i] <= Z" + "@" + domain.com);
+  @ ensures session["email"] is removed &&
+  @ response.data is of type bytes;
+@*/
+"""
+def test_logout(logged_in_client):
+    response = logged_in_client.get('/logout')
+    assert isinstance(response.data, bytes), "Logout route response should be bytes."
 
 """
-@requires A quiz is available and can be taken.
-@ensures The quiz is presented for the user to take.
+Description:
+The server must be running and connected to a database capable of storing quiz data. The session must include 
+a valid email, and the request must contain a non-empty quiz title and a list of questions. The test ensures a 
+new quiz is added to the database.
+
+Semi-formal Notation:
+/*@ requires The server is running &&
+  @ session["email"] matches the format ("a <= email[i] <= z || A <= email[i] <= Z" + "@" + domain.com) &&
+  @ title != "" &&
+  @ questions is a list (questions != None);
+  @ ensures A quiz with the specified title and questions is added to the database &&
+  @ response.data is of type bytes;
+@*/
 """
-def test_take_quiz():
-    """
-    Test the take quiz route to ensure quizzes can be taken.
-    Prints a success message if the test passes.
-    """
-    with app.test_client() as client:
-        try:
-            response = client.get('/take-quiz/1/1')
-            if isinstance(response.data, bytes):
-                print("Take quiz route test passed")
-            else:
-                print("Take quiz route test failed (response is not bytes)")
-        except Exception as e:
-            print(f"Take quiz route test failed with error: {str(e)}")
-
-
-"""
-@requires A valid quiz and user submission data.
-@ensures The quiz answers are submitted successfully.
-"""
-def test_submit_quiz():
-    """
-    Test the submit quiz route to ensure quizzes can be submitted.
-    Prints a success message if the test passes.
-    """
-    with app.test_client() as client:
-        try:
-            with client.session_transaction() as sess:
-                sess['email'] = sample_email
-            
-            # Provide the correct data structure required by the quiz submission endpoint
-            data = {
-                'title': 'Sample Quiz',  # Adding a title to avoid the "title cannot be null" error
-                'questions': [
-                    {'question': 'What is 2+2?', 'options': ['1', '2', '4', '5'], 'correct_option': '4'},
-                    {'question': 'What is the capital of France?', 'options': ['London', 'Paris', 'Rome', 'Berlin'], 'correct_option': 'Paris'}
-                ],
-                'answers': ['4', 'Paris']
-            }
-
-            # Post the quiz with the correct data format
-            response = client.post('/submit-quiz', data=data)
-
-            if isinstance(response.data, bytes):
-                print("Submit quiz route test passed")
-            else:
-                print("Submit quiz route test failed (response is not bytes)")
-
-        except Exception as e:
-            print(f"Submit quiz route test failed with error: {str(e)}")
-
+def test_create_quiz(logged_in_client):
+    data = {'title': 'Sample Quiz', 'questions': []}
+    response = logged_in_client.post('/create-quiz', data=data)
+    assert isinstance(response.data, bytes), "Create quiz route response should be bytes."
 
 """
-@requires A penalty system is in place for wrong answers.
-@ensures The penalty is applied correctly when the user submits wrong answers.
+Description:
+The server must be running and able to handle POST requests to the "/submit-quiz" route. The session must 
+contain a valid email, and the request must include a non-empty list of answers. The test ensures the answers 
+are submitted and stored successfully.
+
+Semi-formal Notation:
+/*@ requires The server is running &&
+  @ session["email"] matches the format ("a <= email[i] <= z || A <= email[i] <= Z" + "@" + domain.com) &&
+  @ answers is a non-empty list (answers != None && len(answers) > 0);
+  @ ensures The answers are stored in the database &&
+  @ response.data is of type bytes;
+@*/
 """
-def test_penalty():
-    """
-    Test the penalty route to ensure penalties are applied for wrong answers.
-    Prints a success message if the test passes.
-    """
-    with app.test_client() as client:
-        try:
-            response = client.get('/penalty/1/1')
-            if isinstance(response.data, bytes):
-                print("Penalty route test passed")
-            else:
-                print("Penalty route test failed (response is not bytes)")
-        except Exception as e:
-            print(f"Penalty route test failed with error: {str(e)}")
-
+def test_submit_quiz(logged_in_client):
+    data = {'answers': ['A', 'B', 'C']}
+    response = logged_in_client.post('/submit-quiz', data=data)
+    assert isinstance(response.data, bytes), "Submit quiz route response should be bytes."
 
 """
-@requires A quiz is created and valid answers are submitted by the user.
-@ensures The submitted answers are processed and feedback is returned to the user.
+Description:
+The server must be active, and the request must include a valid quiz ID (a positive integer greater than 0). 
+The test ensures that the quiz details corresponding to the given ID are retrieved and returned.
+
+Semi-formal Notation:
+/*@ requires The server is running &&
+  @ quiz_id > 0;
+  @ ensures The details of the quiz with the specified ID are retrieved &&
+  @ response.data is of type bytes;
+@*/
 """
-def test_submit_quiz_answer():
-    """
-    Test the submit quiz answer route to ensure quiz answers can be submitted.
-    Prints a success message if the test passes.
-    """
-    with app.test_client() as client:
-        try:
-            with client.session_transaction() as sess:
-                sess['email'] = sample_email
+def test_quiz_detail(client):
+    response = client.get('/quiz/1')
+    assert isinstance(response.data, bytes), "Quiz detail route response should be bytes."
 
-            # Step 1: Create a quiz with valid questions
-            create_quiz_data = {
-                'title': 'Sample Quiz',  # Adding a title to avoid the "title cannot be null" error
-                'questions': [
-                    {'question': 'What is 2+2?', 'options': ['1', '2', '4', '5'], 'correct_option': '4'},
-                    {'question': 'What is the capital of France?', 'options': ['London', 'Paris', 'Rome', 'Berlin'], 'correct_option': 'Paris'}
-                ]
-            }
-            client.post('/create-quiz', data=create_quiz_data)
+"""
+Description:
+The server must be running and capable of retrieving quiz data from the database. The request must include a 
+valid quiz ID (quiz_id > 0) and question number (question_number >= 0). The test ensures the quiz question and 
+options are presented to the user.
 
-            # Step 2: Submit a valid answer for the first question
-            submit_answer_data = {'answer': '4'}  # Answer for the first question
-            response = client.post('/submit-quiz-answer/1/0', data=submit_answer_data)  # Question 0, quiz 1
+Semi-formal Notation:
+/*@ requires The server is running &&
+  @ quiz_id > 0 &&
+  @ question_number >= 0;
+  @ ensures The question and options for the specified quiz and question number are retrieved &&
+  @ response.data is of type bytes;
+@*/
+"""
+def test_take_quiz(client):
+    response = client.get('/take-quiz/1/1')
+    assert isinstance(response.data, bytes), "Take quiz route response should be bytes."
 
-            if isinstance(response.data, bytes):
-                print("Submit quiz answer route test passed")
-            else:
-                print("Submit quiz answer route test failed (response is not bytes)")
+"""
+Description:
+The server must be active and capable of calculating penalties for incorrect answers. The request must include 
+a valid quiz ID (quiz_id > 0) and question number (question_number >= 0). The test ensures the penalty 
+information is correctly calculated and returned.
 
-        except IndexError:
-            print("Submit quiz answer route failed (IndexError: question number is out of range)")
-        except Exception as e:
-            print(f"Submit quiz answer route test failed with error: {str(e)}")
+Semi-formal Notation:
+/*@ requires The server is running &&
+  @ quiz_id > 0 &&
+  @ question_number >= 0;
+  @ ensures The penalty for the incorrect answer is calculated and returned &&
+  @ response.data is of type bytes;
+@*/
+"""
+def test_penalty(client):
+    response = client.get('/penalty/1/1')
+    assert isinstance(response.data, bytes), "Penalty route response should be bytes."
 
+"""
+Description:
+The server must be running and connected to a database capable of processing and storing quiz answers. The 
+session must contain a valid email, and the request must include a valid quiz ID and non-empty answer. The test 
+ensures the answer is stored successfully and feedback is returned to the user.
 
-if __name__ == "__main__":
-    # List of test function names
-    test_functions = [
-        "test_index",
-        "test_home",
-        "test_add_user",
-        "test_login",
-        "test_logout",
-        "test_create_quiz",
-        "test_penalty",
-        "test_quiz_detail",
-        "test_take_quiz",
-        "test_submit_quiz",
-        "test_submit_quiz",
-        "test_submit_quiz_answer"
-    ]
+Semi-formal Notation:
+/*@ requires The server is running &&
+  @ session["email"] matches the format ("a <= email[i] <= z || A <= email[i] <= Z" + "@" + domain.com) &&
+  @ quiz_id > 0 &&
+  @ answer != "" (non-empty string);
+  @ ensures The answer is submitted and feedback is generated &&
+  @ response.data is of type bytes;
+@*/
+"""
+def test_submit_quiz_answer(logged_in_client):
+    # Step 1: Create a quiz with valid questions
+    create_quiz_data = {
+        'title': 'Sample Quiz',
+        'questions': [
+            {'question': 'What is 2+2?', 'options': ['1', '2', '4', '5'], 'correct_option': '4'},
+            {'question': 'What is the capital of France?', 'options': ['London', 'Paris', 'Rome', 'Berlin'], 'correct_option': 'Paris'}
+        ]
+    }
+    logged_in_client.post('/create-quiz', data=create_quiz_data)
 
-    # Iterate over the test functions and call each one dynamically
-    for test_func in test_functions:
-        print("-" * 50)
-        # Use globals() to dynamically call each test function
-        globals()[test_func]()
-    
-    print("-" * 50)
-    print("All tests completed.")
+    # Step 2: Submit a valid answer for the first question
+    submit_answer_data = {'answer': '4'}
+    response = logged_in_client.post('/submit-quiz-answer/1/0', data=submit_answer_data)
+    assert isinstance(response.data, bytes), "Submit quiz answer route response should be bytes."
