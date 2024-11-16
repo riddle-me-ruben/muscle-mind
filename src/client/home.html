@@ -1,13 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+{% extends "music_base.html" %}
+
+{% block title %}
+    Home
+{% endblock %}
+
+{% block head %}
     <link rel="stylesheet" href="/static/home.css">
     <link rel="icon" href="{{ url_for('static', filename='logo.png') }}" type="image/x-icon">
-</head>
-<body>
+{% endblock %}
+
+{% block content %}
     <div class="container">
         <h1>Welcome to Muscle Mind!</h1>
         
@@ -79,5 +81,4 @@
             <button class="logout-button">Log Out</button>
         </a>
     </div>
-</body>
-</html>
+{% endblock %}
