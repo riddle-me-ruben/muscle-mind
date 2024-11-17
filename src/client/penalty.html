@@ -35,10 +35,22 @@
             { name: "Do 5 squats", gif: "/static/squats.gif" }
         ];
 
-        // Randomly select an exercise and display it
-        const selectedExercise = exercises[Math.floor(Math.random() * exercises.length)];
+        // Function to shuffle an array (Fisher-Yates Shuffle)
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Shuffle the exercises and pick the first one
+        const shuffledExercises = shuffleArray([...exercises]);
+        const selectedExercise = shuffledExercises[0];
+
+        // Display the selected exercise
         document.getElementById("exercise-message").innerText = selectedExercise.name;
-        
+
         // Show the corresponding GIF
         const gifElement = document.getElementById("exercise-gif");
         gifElement.src = selectedExercise.gif;
@@ -69,6 +81,29 @@
                 window.location.href = isLastQuestion ? scoreUrl : nextQuestionUrl;
             } else {
                 timerElement.innerText = timeLeft + " seconds remaining";
+            }
+        }, 1000);
+
+        // Play penalty music continuously without restarting
+        let penaltyAudio = window.penaltyAudio;
+        if (!penaltyAudio) {
+            penaltyAudio = new Audio("/static/penalty.mp3");
+            penaltyAudio.loop = true; // Enable looping
+
+            // Check sessionStorage for saved time
+            const savedTime = sessionStorage.getItem("penaltyAudioTime");
+            if (savedTime) {
+                penaltyAudio.currentTime = parseFloat(savedTime); // Resume from saved time
+            }
+
+            penaltyAudio.play();
+            window.penaltyAudio = penaltyAudio; // Store globally to persist across pages
+        }
+
+        // Save current playback time to sessionStorage every second
+        setInterval(() => {
+            if (penaltyAudio && !penaltyAudio.paused) {
+                sessionStorage.setItem("penaltyAudioTime", penaltyAudio.currentTime);
             }
         }, 1000);
     </script>
