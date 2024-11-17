@@ -134,10 +134,11 @@
             <div class="music-status" id="music-status">Music Off</div>
             <div class="song-selector">
                 <select id="song-select">
-                    <option value="song1">Fortnite</option>
+                    <option value="song1">Rhythm & Reps</option>
                     <option value="song2">Midnight</option>
                     <option value="song3">Infinity</option>
                     <option value="song4">Spaceman</option>
+                    <option value="song5">Fortnite</option>
                 </select>
             </div>
         </div>
@@ -156,6 +157,9 @@
     <audio id="audio4" crossorigin="anonymous" loop>
         <source src="{{ url_for('static', filename='music_4.mp3') }}" type="audio/mpeg">
     </audio>
+    <audio id="audio5" crossorigin="anonymous" loop>
+        <source src="{{ url_for('static', filename='music_5.mp3') }}" type="audio/mpeg">
+    </audio>
 
     {% block content %}{% endblock %}
 
@@ -171,7 +175,8 @@
             song1: document.getElementById('audio1'),
             song2: document.getElementById('audio2'),
             song3: document.getElementById('audio3'),
-            song4: document.getElementById('audio4')
+            song4: document.getElementById('audio4'),
+            song5: document.getElementById('audio5')
         };
 
         let currentAudio = audioElements[musicState.currentSong];

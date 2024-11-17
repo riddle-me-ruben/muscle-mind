@@ -74,9 +74,11 @@ h1,h2 {
     padding: 10px;
     font-size: 1em;
     width: 100%;
-    margin-bottom: 10px;
-    border: none;
+    margin-bottom: 15px;
+    border: 1px solid #00b89a;
     border-radius: 10px;
+    background-color: #1e2a38;
+    color: #ffffff;
     outline: none;
 }
 
@@ -232,25 +234,6 @@ ul {
     margin-bottom: 20px; /* Add spacing below the control */
 }
 
-/* Responsive design for smaller screens */
-@media (max-width: 650px) {
-    button,
-    .view-quiz-button,
-    .take-quiz-button,
-    .delete-quiz-button {
-        font-size: 1.8em;
-        padding: 15px 20px;
-    }
-
-    h1 {
-        font-size: 48px;
-    }
-
-    .quiz-title {
-        font-size: 2.4em;
-    }
-}
-
 .quiz-play-stats p {
     font-size: 1.5em; /* Larger text for emphasis */
     font-weight: bold; /* Bold text for importance */
@@ -268,4 +251,68 @@ ul {
     transform: scale(1.05); /* Slight zoom effect on hover */
     background-color: #00b89a; /* Change background on hover */
     color: #ffffff; /* White text on hover for contrast */
+}
+
+/* Flash messages container */
+.flash-messages {
+    display: flex; /* Use flex for centering */
+    flex-direction: column;
+    align-items: center; /* Center content horizontally */
+    justify-content: center; /* Center content vertically */
+    margin: 20px 0;
+    padding: 15px;
+    border-radius: 12px;
+}
+
+/* General alert styles */
+.alert {
+    display: inline-block; /* Ensure messages are contained */
+    padding: 15px 20px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+    font-size: 1.2em;
+    max-width: 500px; /* Prevent messages from being too wide */
+    text-align: center;
+    transition: all 0.3s ease; /* Smooth hover effect */
+}
+
+/* Error alert */
+.alert-error {
+    background-color: #9000efde; /* Use consistent red */
+    color: #ffffff;
+    box-shadow: 0 4px 8px rgba(255, 92, 92, 0.3); /* Add subtle shadow */
+}
+
+/* Info alert */
+.alert-info {
+    background-color: #4A90E2; /* Blue for info messages */
+    color: #ffffff;
+    border: 2px solid #357ABD; /* Slight border for distinction */
+    box-shadow: 0 4px 8px rgba(74, 144, 226, 0.3); /* Add subtle shadow */
+}
+
+/* Hover effects for alerts */
+.alert:hover {
+    transform: translateY(-5px) scale(1.05); /* Slight hover lift */
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3); /* Enhanced shadow */
+    cursor: pointer; /* Change cursor to indicate interactivity */
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 650px) {
+    button,
+    .view-quiz-button,
+    .take-quiz-button,
+    .delete-quiz-button {
+        font-size: 1.8em;
+        padding: 15px 20px;
+    }
+
+    h1 {
+        font-size: 48px;
+    }
+
+    .quiz-title {
+        font-size: 2.4em;
+    }
 }
