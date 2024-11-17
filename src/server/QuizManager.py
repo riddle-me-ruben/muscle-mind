@@ -4,17 +4,33 @@ from QuizSubmissionManager import QuizSubmissionManager
 from flask import redirect, url_for, flash, session
 
 """
-The QuizManager class acts as a controller, delegating quiz-related tasks such as creation, retrieval, and submission to the respective manager classes.
-@requires A valid DatabaseManager, session, and managers for quiz creation, retrieval, and submission
-@ensures Centralized management of quiz-related operations by coordinating between different managers
+Description:
+The QuizManager class serves as a centralized controller for managing quiz-related tasks. It delegates specific 
+operations such as creation, retrieval, and submission to the respective manager classes. This ensures modularity 
+and separation of concerns in the quiz management process.
+
+Semi-formal Notation:
+/*@ requires A valid DatabaseManager instance (db_manager != null) &&
+  @ session is initialized and active &&
+  @ QuizCreationManager, QuizRetrievalManager, and QuizSubmissionManager are properly instantiated;
+  @ ensures QuizManager coordinates and delegates quiz-related tasks between managers:
+  @   - Quiz creation via QuizCreationManager;
+  @   - Quiz retrieval via QuizRetrievalManager;
+  @   - Quiz submission via QuizSubmissionManager;
+@*/
 """
 class QuizManager:
+
     """
-    Initialize the QuizManager and set up all the quiz-related managers
-    db_manager: DatabaseManager - The manager responsible for database operations
-    session: dict - The session object for tracking user information
-    @requires A valid DatabaseManager and session object
-    @ensures QuizManager is ready to handle quiz creation, retrieval, and submission
+    Description:
+    Initializes the QuizManager by creating instances of QuizCreationManager, QuizRetrievalManager, and 
+    QuizSubmissionManager. This prepares the class to handle quiz-related tasks.
+
+    Semi-formal Notation:
+    /*@ requires db_manager != null (valid instance of DatabaseManager) &&
+    @ session is active;
+    @ ensures self.quiz_creation, self.quiz_retrieval, self.quiz_submission are instantiated and ready for use;
+    @*/
     """
     def __init__(self, db_manager):
         self.quiz_creation = QuizCreationManager(db_manager)
@@ -23,18 +39,29 @@ class QuizManager:
 
 
     """
-    Delegate the quiz creation process to QuizCreationManager
-    @requires QuizCreationManager to be initialized
-    @ensures Quiz creation is handled by QuizCreationManager
+    Description:
+    Delegates the process of quiz creation to the QuizCreationManager. This method ensures that quiz creation 
+    tasks, such as rendering forms and storing quizzes, are handled appropriately.
+
+    Semi-formal Notation:
+    /*@ requires self.quiz_creation != null (QuizCreationManager is instantiated);
+    @ ensures Quiz creation process is delegated to self.quiz_creation.create_quiz();
+    @*/
     """
     def create_quiz(self):
         return self.quiz_creation.create_quiz()
 
     """
-    Handle the deletion of a quiz by ID, ensuring the user is logged in
-    quiz_id: int - The ID of the quiz
-    @requires A valid quiz_id and user session
-    @ensures The quiz is deleted and the user is redirected to the home page
+    Description:
+    Handles the deletion of a quiz by ID. Ensures that only logged-in users can delete quizzes and delegates the 
+    deletion task to QuizRetrievalManager.
+
+    Semi-formal Notation:
+    /*@ requires quiz_id > 0 (valid quiz ID) &&
+    @ session['email'] != null (user is logged in);
+    @ ensures Quiz with ID quiz_id is deleted if it belongs to the user identified by session['email'];
+    @ ensures Redirects the user to the home page after deletion;
+    @*/
     """
     def delete_quiz(self, quiz_id):
         if 'email' not in session:
@@ -47,68 +74,100 @@ class QuizManager:
 
 
     """
-    Delegate the quiz submission process to QuizCreationManager
-    @requires QuizCreationManager to be initialized
-    @ensures Quiz submission is handled by QuizCreationManager
+    Description:
+    Delegates the quiz submission process to QuizCreationManager. Handles tasks such as validating and storing 
+    submitted quiz data.
+
+    Semi-formal Notation:
+    /*@ requires self.quiz_creation != null (QuizCreationManager is instantiated);
+    @ ensures Quiz submission process is delegated to self.quiz_creation.submit_quiz();
+    @*/
     """
     def submit_quiz(self):
         return self.quiz_creation.submit_quiz()
 
     """
-    Fetch the quizzes created by a user
-    user_email: str - The email of the user
-    @requires A valid user_email and QuizRetrievalManager to be initialized
-    @ensures Returns the quizzes created by the user
+    Description:
+    Fetches all quizzes created by a specific user. Delegates the retrieval task to QuizRetrievalManager.
+
+    Semi-formal Notation:
+    /*@ requires user_email is a valid string &&
+    @ self.quiz_retrieval != null (QuizRetrievalManager is instantiated);
+    @ ensures \result == self.quiz_retrieval.get_user_quizzes(user_email);
+    @*/
     """
     def get_user_quizzes(self, user_email):
         return self.quiz_retrieval.get_user_quizzes(user_email)
 
     """
-    Delegate fetching the quiz details to QuizRetrievalManager
-    quiz_id: int - The ID of the quiz
-    @requires QuizRetrievalManager to be initialized
-    @ensures Quiz details are fetched and rendered
+    Description:
+    Fetches the details of a specific quiz identified by its ID. Delegates this task to QuizRetrievalManager.
+
+    Semi-formal Notation:
+    /*@ requires quiz_id > 0 (valid quiz ID) &&
+    @ self.quiz_retrieval != null (QuizRetrievalManager is instantiated);
+    @ ensures \result == self.quiz_retrieval.quiz_detail(quiz_id);
+    @*/
     """
     def quiz_detail(self, quiz_id):
         return self.quiz_retrieval.quiz_detail(quiz_id)
 
     """
-    Delegate the process of taking a quiz to QuizSubmissionManager
-    quiz_id: int - The ID of the quiz
-    question_num: int - The current question number
-    @requires QuizSubmissionManager to be initialized
-    @ensures The quiz is rendered with the current question
+    Description:
+    Handles the process of taking a quiz by delegating to QuizSubmissionManager. Renders the quiz and the current 
+    question.
+
+    Semi-formal Notation:
+    /*@ requires quiz_id > 0 &&
+    @ question_num >= 0 &&
+    @ self.quiz_submission != null (QuizSubmissionManager is instantiated);
+    @ ensures \result == self.quiz_submission.take_quiz(quiz_id, question_num);
+    @*/
     """
     def take_quiz(self, quiz_id, question_num):
         return self.quiz_submission.take_quiz(quiz_id, question_num)
 
     """
-    Delegate submitting an answer to a quiz question to QuizSubmissionManager
-    quiz_id: int - The ID of the quiz
-    question_num: int - The current question number
-    @requires QuizSubmissionManager to be initialized
-    @ensures The answer is submitted and the next question is rendered or the score is shown
+    Description:
+    Handles the submission of an answer for a specific quiz question. Delegates this task to QuizSubmissionManager.
+
+    Semi-formal Notation:
+    /*@ requires quiz_id > 0 &&
+    @ question_num >= 0 &&
+    @ self.quiz_submission != null (QuizSubmissionManager is instantiated);
+    @ ensures Answer for question_num in quiz_id is submitted and further actions are taken:
+    @   - Render next question if available;
+    @   - Render score if all questions are completed;
+    @*/
     """
     def submit_quiz_answer(self, quiz_id, question_num):
         return self.quiz_submission.submit_quiz_answer(quiz_id, question_num)
 
     """
-    Display the final quiz score to the user
-    quiz_id: int - The ID of the quiz
-    score: int - The user's score
-    total: int - The total number of questions
-    @requires Valid quiz_id, score, and total
-    @ensures The final quiz score is rendered
+    Description:
+    Displays the final score for a completed quiz. Delegates this task to QuizSubmissionManager.
+
+    Semi-formal Notation:
+    /*@ requires quiz_id > 0 &&
+    @ score >= 0 &&
+    @ total > 0 &&
+    @ self.quiz_submission != null (QuizSubmissionManager is instantiated);
+    @ ensures \result == self.quiz_submission.score(quiz_id, score, total);
+    @*/
     """
     def score(self, quiz_id, score, total):
         return self.quiz_submission.score(quiz_id, score, total)
 
     """
-    Display the penalty for an incorrect quiz answer
-    quiz_id: int - The ID of the quiz
-    question_num: int - The current question number
-    @requires QuizSubmissionManager to be initialized
-    @ensures The penalty screen is shown for incorrect answers
+    Description:
+    Displays the penalty screen for an incorrect answer. Delegates this task to QuizSubmissionManager.
+
+    Semi-formal Notation:
+    /*@ requires quiz_id > 0 &&
+    @ question_num >= 0 &&
+    @ self.quiz_submission != null (QuizSubmissionManager is instantiated);
+    @ ensures \result == self.quiz_submission.penalty(quiz_id, question_num);
+    @*/
     """
     def penalty(self, quiz_id, question_num):
         return self.quiz_submission.penalty(quiz_id, question_num)

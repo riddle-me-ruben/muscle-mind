@@ -8,25 +8,32 @@ from dotenv import load_dotenv
 import os
 
 """
-The App class initializes and manages the Flask application for the Muscle-Mind system, acting as the central 
-mediator between the database subsystem and the quiz management subsystem. This class configures the app, 
-sets up environment variables, manages user sessions, and provides a streamlined interface to handle quiz 
-creation, user management, and data retrieval from the database.
+Description:
+The App class initializes and manages the central Flask application for the Muscle-Mind platform. It integrates 
+backend components for user management, quiz handling, and data analytics, defining routes to handle specific 
+functionalities and ensuring a consistent flow for user interactions and backend operations.
 
-@requires:
-- Environment variables, including Flask app configurations and MySQL credentials, must be set.
-- DatabaseManager, QuizManager, and UserManager are instantiated and correctly set up to handle database and 
-    user operations.
-
-@ensures:
-- The app is fully configured and ready to mediate user interactions with the quiz and database subsystems.
-- Requests are directed to the correct endpoints, enabling efficient handling of quiz, user, and data operations.
+Semi-formal Notation:
+/*@ requires Environment variables are defined (e.g., SECRET_KEY != null) &&
+  @ DatabaseManager, QuizManager, UserManager, DataAnalyticsManager, QuizRetrievalManager are initialized &&
+  @ \forall route in { '/', '/add_user', '/login', '/home', ... } (route is valid);
+  @ ensures \forall endpoint in self.app.routes (endpoint.method in {"GET", "POST"} && endpoint.handler != null);
+@*/
 """
 class App:
+    
     """
-    Initialize the App class and set up the Flask app, database manager, and other managers
-    @requires Environment variables to be loaded, Flask app to be initialized
-    @ensures Flask app and all managers (db_manager, quiz_manager, user_manager) are set up
+    Description:
+    This method initializes the Flask app instance, loads required environment variables, and sets up manager 
+    objects. It configures the app to handle sessions, route requests, and perform operations on the database.
+
+    Semi-formal Notation:
+    /*@ requires os.getenv("SECRET_KEY") != null &&
+    @ load_dotenv() initializes environment variables &&
+    @ \forall manager in {DatabaseManager, QuizManager, UserManager, ...} (manager != null);
+    @ ensures self.app.config['SECRET_KEY'] == os.getenv('SECRET_KEY') &&
+    @ self.db_manager, self.quiz_manager, self.user_manager, ... are instantiated;
+    @*/
     """
     def __init__(self):
         load_dotenv()
@@ -44,9 +51,16 @@ class App:
         self.initialize_routes()
 
     """
-    Initialize the routes for the Flask app
-    @requires self.app to be initialized and Flask instance to be active
-    @ensures All app routes are defined and linked to corresponding methods
+    Description:
+    This method registers all routes for the application and maps them to their respective handler functions. 
+    It defines the HTTP methods that each route supports, ensuring compatibility with Flask's routing system.
+
+    Semi-formal Notation:
+    /*@ requires self.app != null &&
+    @ \forall route in route_definitions (route.handler != null &&
+    @ route.methods subseteq {"GET", "POST"});
+    @ ensures \forall rule in route_definitions (self.app.routes.contains(rule));
+    @*/
     """
     def initialize_routes(self):
         # Define routes with various HTTP methods
@@ -73,9 +87,15 @@ class App:
             self.app.add_url_rule(rule, endpoint, view_func, methods=methods)
 
     """
-    Render the index page or redirect to home if user is signed in
-    @requires session to track if user is signed in
-    @ensures Index page is rendered or redirects to home
+    Description:
+    This route renders the index page for unauthenticated users or redirects signed-in users to the home page. 
+    It uses session tracking to determine the sign-in state of the user.
+
+    Semi-formal Notation:
+    /*@ requires self.user_manager.is_signed_in() == (session['email'] != null) &&
+    @ session is properly initialized;
+    @ ensures \result == (session['email'] != null ? redirect(url_for('home')) : render_template('index.html'));
+    @*/
     """
     def index(self):
         if self.user_manager.is_signed_in():
@@ -83,10 +103,16 @@ class App:
         return render_template('index.html')
 
     """
-    Render the home page showing quizzes created by the user
-    user_email: str - Email of the user from the session
-    @requires user must be signed in and user_email stored in session
-    @ensures Home page is rendered with the user's quizzes
+    Description:
+    This route handles rendering the home page for the signed-in user. It retrieves user-specific quizzes and 
+    analytics data from the database. If the session contains another user's email, their quizzes are displayed instead.
+
+    Semi-formal Notation:
+    /*@ requires session['email'] != null &&
+    @ \forall quiz in quizzes (quiz.owner == (session.get('other_user_email') ?: session['email'])) &&
+    @ analytics = null if session['other_user_email'] != null;
+    @ ensures \result == render_template('home.html', quizzes=quizzes, analytics=analytics);
+    @*/
     """
     def home(self):
         if not self.user_manager.is_signed_in():
@@ -104,9 +130,15 @@ class App:
         return render_template('home.html', quizzes=quizzes, analytics=analytics)
 
     """
-    Start the Flask app in debug mode
-    @requires Flask app instance to be initialized
-    @ensures The Flask app is running in debug mode
+    Description:
+    This method starts the Flask app server in debug mode, binding it to the specified port. The port is fetched 
+    from the environment variable "PORT" or defaults to 10000 if not set.
+
+    Semi-formal Notation:
+    /*@ requires self.app != null &&
+    @ os.environ.get("PORT") == null ? port == 10000 : port == int(os.environ.get("PORT"));
+    @ ensures self.app.run(host="0.0.0.0", port=port, debug=True);
+    @*/
     """
     def run(self):
         port = int(os.environ.get('PORT', 10000))  # Use PORT environment variable
@@ -114,9 +146,15 @@ class App:
         self.app.run(debug=True)
 
 """
-Main entry point for running the Flask app
-@requires App class to be initialized
-@ensures The Flask app runs with debugging enabled
+Description:
+This is the main entry point of the application. It initializes the App class and starts the Flask server 
+with debugging enabled, ensuring the app is ready to process HTTP requests.
+
+Semi-formal Notation:
+/*@ requires App is defined &&
+  @ app_instance != null;
+  @ ensures app_instance.run(debug=True) starts the Flask app server;
+@*/
 """
 def main():
     app_instance = App()

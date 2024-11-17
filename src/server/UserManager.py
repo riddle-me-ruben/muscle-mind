@@ -1,44 +1,82 @@
 from flask import render_template, request, session, redirect, url_for
 
 """
-The UserManager class manages user-related actions such as registration, login, logout, and session handling.
-@requires A valid DatabaseManager for user-related database operations and session object for tracking user status
-@ensures Proper user management through functions like sign-in, registration, and sign-out
+Description:
+The UserManager class handles user-related actions, including registration, login, logout, and session tracking. 
+It interacts with the database to validate user credentials and manage user data, ensuring secure and efficient 
+user management.
+
+Semi-formal Notation:
+/*@ requires db_manager != null (valid DatabaseManager instance) &&
+  @ session is a valid session object;
+  @ ensures UserManager facilitates:
+  @   - User registration through add_user;
+  @   - User authentication and login via login;
+  @   - User logout and session clearing via logout;
+  @   - Session-based tracking of login status through is_signed_in;
+@*/
 """
 class UserManager:
     """
-    Initialize the UserManager with a database manager and session object
-    db_manager: DatabaseManager - The manager responsible for database operations
-    session: dict - The session object for tracking user information
-    @requires A valid DatabaseManager and session object
-    @ensures UserManager is ready to handle user-related tasks such as login, logout, and registration
+    Description:
+    Initializes the UserManager with a DatabaseManager for database operations and a session object for tracking 
+    user information.
+
+    Semi-formal Notation:
+    /*@ requires db_manager != null (valid DatabaseManager instance) &&
+    @ session is a valid session object;
+    @ ensures self.db_manager == db_manager &&
+    @ ensures self.session == session;
+    @*/
     """
     def __init__(self, db_manager, session):
         self.db_manager = db_manager
         self.session = session
 
     """
-    Check if the user is currently signed in
-    @requires A session object that tracks user login status
-    @ensures Returns True if the user is signed in, False otherwise
+    Description:
+    Checks whether the current user is signed in by verifying the presence of the 'email' key in the session object.
+
+    Semi-formal Notation:
+    /*@ requires session is a valid session object;
+    @ ensures \result == ('email' in session);
+    @*/
     """
     def is_signed_in(self):
         return 'email' in session
 
     """
-    Check if a user exists in the database with the provided email
-    email: str - The email address to check for existence
-    @requires A valid email string
-    @ensures Returns the existing user data if the user exists, None otherwise
+    Description:
+    Checks if a user exists in the database using the provided email address. Queries the `users` table to find a 
+    matching email.
+
+    Semi-formal Notation:
+    /*@ requires email is a valid non-empty string &&
+    @ db_manager.execute_query(query, params) functions correctly;
+    @ ensures If email exists in the `users` table:
+    @   \result == Row of user data matching the email;
+    @ ensures If email does not exist in the `users` table:
+    @   \result == None;
+    @*/
     """
     def user_exists(self, email):
         existing_user = self.db_manager.execute_query("SELECT * FROM users WHERE email = %s", (email,))
         return existing_user
 
     """
-    Add a new user to the database
-    @requires The email and password fields to be provided in the request form
-    @ensures Adds the user to the database if the email is not already taken, or displays an error message
+    Description:
+    Registers a new user in the database using the provided email and password. Validates that the email is unique 
+    before insertion.
+
+    Semi-formal Notation:
+    /*@ requires request.form contains 'email' and 'password' fields &&
+    @ email is unique in the `users` table;
+    @ ensures If email is unique:
+    @   Inserts a new row into `users` table with email and password &&
+    @   Renders 'index.html' with success message;
+    @ ensures If email is not unique:
+    @   Renders 'index.html' with error message;
+    @*/
     """
     def add_user(self):
         email = request.form['email']
@@ -53,9 +91,20 @@ class UserManager:
         return render_template('index.html', success2="Registration successful! You may now log in.")
 
     """
-    Log in the user by checking their credentials
-    @requires The email and password fields to be provided in the request form
-    @ensures If credentials are valid, the user is logged in and redirected to the home page, otherwise an error is displayed
+    Description:
+    Authenticates a user by checking their email and password against the database. If valid, logs the user in by 
+    storing their email in the session and redirects them to the home page.
+
+    Semi-formal Notation:
+    /*@ requires request.method == 'POST' &&
+    @ request.form contains 'email' and 'password' fields &&
+    @ db_manager.execute_query(query, params) functions correctly;
+    @ ensures If email and password match a row in the `users` table:
+    @   session['email'] == email &&
+    @   Redirects to 'home';
+    @ ensures If email or password are invalid:
+    @   Renders 'login.html' with error message;
+    @*/
     """
     def login(self):
         if request.method == 'POST':
@@ -74,9 +123,15 @@ class UserManager:
         return render_template('login.html', error=None)
 
     """
-    Log out the user by clearing the session
-    @requires The user to be logged in (i.e., 'email' key exists in session)
-    @ensures The session is cleared and the user is redirected to the index page
+    Description:
+    Logs out the current user by clearing their session data and redirecting them to the index page.
+
+    Semi-formal Notation:
+    /*@ requires 'email' in session (user is logged in);
+    @ ensures session['email'] == None &&
+    @ ensures session['other_user_email'] == None &&
+    @ ensures Redirects to 'index';
+    @*/
     """
     def logout(self):
         session.pop('email', None)
