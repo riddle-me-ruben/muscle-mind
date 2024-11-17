@@ -9,6 +9,8 @@ The primary goal of **Muscle-Mind** is to promote fitness and learning in a fun 
 - **Create Custom Quizzes**: Registered users can create their own quizzes, making the platform highly customizable.
 - **Exercise Penalties**: Wrong answers result in a random exercise challenge, such as performing 15 squats, 10 push-ups, or a short jumping jack session.
 - **Grade Reports**: Players can receive a grade report of their score for each quiz.
+- **Play and View Quizzes created by others**: Players can enter an email to view and take quizzes created by other players.
+- **User Analytics**: Players can view statistics related to their account such as quizzes taken and average score.
 
 ## How to Play
 1. Players begin by logging in to access their custom quizzes.
@@ -18,11 +20,15 @@ The primary goal of **Muscle-Mind** is to promote fitness and learning in a fun 
 
 ## Technology Stack
 - **Frontend**
-  - HTML/CSS
+  - HTML
+  - CSS
+  - JavaScript
 - **Backend**
   - Flask (Python)
 - **Database**
   - MySQL
+- **Testing**
+  - PyTest 
 
 ## Contributions
 This project is developed as part of the Software Construction **CS 4374 course**. The game’s initial focus is on creating a robust fitness quiz platform that integrates both mental and physical challenges for a unique learning experience.
