@@ -39,15 +39,15 @@ class DataAnalyticsManager:
         if not user_email:
             return None
         
-        # Query to get the number of quizzes taken
-        quizzes_taken_query = "SELECT COUNT(quiz_id) FROM user_quiz_stats WHERE user_email = %s"
+        # Query to get the number of quizzes taken, including rows where quiz_id is NULL
+        quizzes_taken_query = "SELECT COUNT(*) FROM user_quiz_stats WHERE user_email = %s"
         quizzes_taken = self.db_manager.execute_query(quizzes_taken_query, (user_email,))[0][0]
 
         # Query to get the total questions answered
         questions_answered_query = "SELECT SUM(questions_answered) FROM user_quiz_stats WHERE user_email = %s"
         questions_answered = self.db_manager.execute_query(questions_answered_query, (user_email,))[0][0] or 0
 
-         # Calculate the average score as a percentage
+        # Query to get the total score
         total_score_query = "SELECT SUM(score) FROM user_quiz_stats WHERE user_email = %s"
         total_score = self.db_manager.execute_query(total_score_query, (user_email,))[0][0] or 0
 
@@ -59,3 +59,4 @@ class DataAnalyticsManager:
             'questions_answered': questions_answered,
             'avg_score': round(avg_score_percentage, 2)  # Rounded to 2 decimal places for percentage display
         }
+

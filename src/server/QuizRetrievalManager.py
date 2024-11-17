@@ -1,4 +1,4 @@
-from flask import render_template, request, session
+from flask import render_template, request, session, redirect, url_for, flash
 
 class QuizRetrievalManager:
     """
@@ -18,11 +18,9 @@ class QuizRetrievalManager:
     @requires A valid quiz_id, user_email, and database connection
     @ensures The quiz data is returned including its questions and title
     """
-    def delete_quiz(self, quiz_id, user_email):
-        # Delete related entries in user_quiz_stats
-        delete_stats_query = "DELETE FROM user_quiz_stats WHERE quiz_id = %s"
-        self.db_manager.execute_commit(delete_stats_query, (quiz_id,))
-        
+    def delete_quiz(self, quiz_id, user_email):       
+        nullify_stats_query = "UPDATE user_quiz_stats SET quiz_id = NULL WHERE quiz_id = %s"
+        self.db_manager.execute_commit(nullify_stats_query, (quiz_id,))
         # Delete the quiz itself
         delete_quiz_query = "DELETE FROM quizzes WHERE quiz_id = %s AND user_email = %s"
         self.db_manager.execute_commit(delete_quiz_query, (quiz_id, user_email))
@@ -151,15 +149,9 @@ class QuizRetrievalManager:
 
         # Check if the email exists
         if not self.email_exists(other_user_email):
-            error_message = f"The email '{other_user_email}' does not exist!"
-            analytics = self.analytics_manager.get_user_analytics()
-            return render_template(
-                'home.html',
-                quizzes=[],
-                analytics=analytics,
-                error_message=error_message
-            )
-        
+            flash(f"The email '{other_user_email}' does not exist!", 'error')
+            return redirect(url_for('home'))  # Redirect back to the current page without changes
+
         # If email exists, proceed to fetch quizzes
         session['other_user_email'] = other_user_email  # Maintain context for valid email
         quizzes = self.get_user_quizzes(other_user_email)

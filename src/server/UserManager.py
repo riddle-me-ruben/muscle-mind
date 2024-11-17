@@ -80,4 +80,5 @@ class UserManager:
     """
     def logout(self):
         session.pop('email', None)
+        session.pop('other_user_email', None)
         return redirect(url_for('index'))

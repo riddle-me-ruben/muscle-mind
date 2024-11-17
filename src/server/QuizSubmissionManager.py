@@ -89,7 +89,7 @@ class QuizSubmissionManager:
             """
             self.db_manager.execute_commit(query, (user_email, quiz_id, total, score, total, score))
         
-        # session.pop('current_score', None)
+        session.pop('current_score', None)
         return render_template('score.html', score=score, total=total)
 
     """
