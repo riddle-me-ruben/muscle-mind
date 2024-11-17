@@ -23,13 +23,20 @@
                 </div>
             </form>
 
-            <!-- Separate form for restoring own quizzes -->
+            <!-- Form to restore user quizzes -->
             <form action="{{ url_for('restore_user_quizzes') }}" method="POST" class="restore-form">
                 <div class="button-group">
                     <button type="submit" class="restore-user-button">Restore My Quizzes</button>
                 </div>
             </form>
         </div>
+
+        
+        {% if error_message %}
+            <div class="error-message">
+                <p>{{ error_message }}</p>
+            </div>
+        {% endif %}
 
         <!-- User Analytics Section -->
         {% if analytics %}
@@ -46,15 +53,15 @@
             <button class="create-quiz-button">Create Quiz</button>
         </a>
 
-        <!-- Conditional Heading for Quizzes -->
-        {% if quizzes and quizzes|length > 0 %}
-            {% if session.get('other_user_email') %}
-                <h2>You are viewing quizzes {{ session.get('other_user_email') }} has created</h2>
-                <h2>🏋️ {{ session.get('other_user_email') }}'s Gym 🏋️ </h2>
-            {% else %}
-                <h2>You are signed in as: {{ session.get('email') }} </h2>
-                <h2> 🏋️‍♂️ {{ session.get('email') }}'s Gym 🏋️‍♂️ </h2> 
-            {% endif %}
+        {% if session.get('other_user_email') and not error_message %}
+        <h2>You are viewing quizzes {{ session.get('other_user_email') }} has created</h2>
+        <h2>🏋️ {{ session.get('other_user_email') }}'s Gym 🏋️ </h2>
+        {% elif not session.get('other_user_email') %}
+        <h2>You are signed in as: {{ session.get('email') }} </h2>
+        <h2> 🏋️‍♂️ {{ session.get('email') }}'s Gym 🏋️‍♂️ </h2> 
+        {% endif %}
+            <!-- Conditional Heading for Quizzes -->
+            {% if quizzes and quizzes|length > 0 %}
             <ul>
                 {% for quiz in quizzes %}
                 <li class="quiz-item">
@@ -80,7 +87,7 @@
                 {% endfor %}
             </ul>
         {% else %}
-        <button style="text-align: center;" class="no-quiz-button">😢 No quizzes available. Why not create one?</button>
+        <button style="text-align: center;" class="no-quiz-button">😢 No quizzes available.</button>
         {% endif %}
 
         <a href="{{ url_for('logout') }}">

@@ -73,7 +73,6 @@ class QuizCreationManager:
         title = request.form.get('title')
         audio_file = request.form.get('audio_file', 'option1.mp3')
 
-        print("Audio file from form", audio_file)
         audio_file = audio_file.replace('media/', '')
 
         return num_questions, title, audio_file

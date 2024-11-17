@@ -69,9 +69,7 @@ class QuizRetrievalManager:
     """
     def fetch_quiz(self, quiz_id):
         quiz_query, params = self.build_quiz_query(quiz_id)
-        print(f"Quiz Query: {quiz_query}")
         quiz = self.db_manager.execute_query(quiz_query, params)
-        print("Returned quiz", quiz)
         return quiz
 
     """
@@ -118,7 +116,6 @@ class QuizRetrievalManager:
                     ],
                     'correct_option': quiz_data.get(f'correct_option{i}')
                 })
-        print(questions)
         return questions
 
     """
@@ -133,8 +130,6 @@ class QuizRetrievalManager:
             return "Quiz not found", 404
         audio_file = f"/static/media/{quiz.get('audio_file', 'option1.mp3')}"
 
-        print(f"Audio File in quiz_detail: {audio_file}")
-
         return render_template('quiz-detail.html', quiz=quiz, audio_file=audio_file)
 
     """
@@ -148,17 +143,29 @@ class QuizRetrievalManager:
         result = self.db_manager.execute_query(query, (user_email,))
         
         quizzes = [{'quiz_id': row[0], 'title': row[1], 'audio_file': row[2], 'creator_play_count': row[3], 'user_play_count': row[4]} for row in result]
-        print("Quizzes in get_user_quizzes", quizzes)
         return quizzes
 
     # TODO: Add comments
     def view_other_user_quizzes(self):
         other_user_email = session.get('other_user_email', request.form.get('other_user_email'))
-        if other_user_email:
-            session['other_user_email'] = other_user_email  # Maintain context
+
+        # Check if the email exists
+        if not self.email_exists(other_user_email):
+            error_message = f"The email '{other_user_email}' does not exist!"
+            analytics = self.analytics_manager.get_user_analytics()
+            return render_template(
+                'home.html',
+                quizzes=[],
+                analytics=analytics,
+                error_message=error_message
+            )
+        
+        # If email exists, proceed to fetch quizzes
+        session['other_user_email'] = other_user_email  # Maintain context for valid email
         quizzes = self.get_user_quizzes(other_user_email)
-        analytics = self.analytics_manager.get_user_analytics()  # Always show analytics
-        return render_template('home.html', quizzes=quizzes, analytics=analytics, other_user_email=other_user_email)
+        analytics = self.analytics_manager.get_user_analytics()
+
+        return render_template('home.html',quizzes=quizzes,analytics=analytics,other_user_email=other_user_email)
 
     def restore_user_quizzes(self):
         session.pop('other_user_email', None)  # Clear other user's context
@@ -166,3 +173,14 @@ class QuizRetrievalManager:
         quizzes = self.get_user_quizzes(user_email)
         analytics = self.analytics_manager.get_user_analytics()
         return render_template('home.html', quizzes=quizzes, analytics=analytics)
+
+    """
+    Check if a given email exists in the database.
+    email: str - The email to check
+    @requires A valid email and database connection
+    @ensures Returns True if the email exists, False otherwise
+    """
+    def email_exists(self, email):
+        query = "SELECT 1 FROM users WHERE email = %s LIMIT 1"
+        result = self.db_manager.execute_query(query, (email,))
+        return len(result) > 0

@@ -30,23 +30,6 @@ class QuizSubmissionManager:
         if quiz is None:
             return "Quiz not found", 404
 
-        # Check if the current user is the creator
-        user_email = session.get('email')
-        print("Quiz in taking the quiz: ", quiz)
-        # Check if play count for this quiz has already been incremented in the current session
-        if f'quiz_{quiz_id}_played' not in session:
-            user_email = session.get('email')
-            if user_email == quiz['creator_email']:
-                update_query = "UPDATE quizzes SET creator_play_count = creator_play_count + 1 WHERE quiz_id = %s"
-            else:
-                update_query = "UPDATE quizzes SET user_play_count = user_play_count + 1 WHERE quiz_id = %s"
-
-            # Increment play count in the database
-            self.db_manager.execute_commit(update_query, (quiz_id,))
-
-            # Mark this quiz as played in the session
-            session[f'quiz_{quiz_id}_played'] = True
-
         if question_num >= len(quiz['questions']):
             return redirect(url_for('home'))
         return render_template('take-quiz.html', quiz=quiz, question_num=question_num, quiz_id=quiz_id)
@@ -106,7 +89,7 @@ class QuizSubmissionManager:
             """
             self.db_manager.execute_commit(query, (user_email, quiz_id, total, score, total, score))
         
-        session.pop('current_score', None)
+        # session.pop('current_score', None)
         return render_template('score.html', score=score, total=total)
 
     """
