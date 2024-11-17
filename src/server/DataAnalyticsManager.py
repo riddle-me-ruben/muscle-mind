@@ -1,38 +1,53 @@
 from flask import session
 
 """
+Description:
 The DataAnalyticsManager class calculates and retrieves user engagement metrics for the Muscle-Mind application. 
-It provides analytics such as the total number of quizzes taken, the total number of questions answered, and 
-the user's average score as a percentage. This data offers users insight into their performance and activity 
-within the platform, enhancing their experience by making progress visible.
+It provides statistics such as the total number of quizzes taken, total questions answered, and the user's 
+average score in percentage format. These metrics are designed to enhance the user experience by offering 
+insights into progress and performance.
 
-@requires:
-- A valid DatabaseManager instance to execute queries.
-- The user's email to be stored in the session object to identify the user.
-
-@ensures:
-- Provides accurate user analytics, with results returned as a dictionary containing:
-    - 'quizzes_taken': int - Total number of distinct quizzes taken by the user.
-    - 'questions_answered': int - Total number of questions answered by the user across all quizzes.
-    - 'avg_score': float - Average score in percentage format, rounded to two decimal places.
+Semi-formal Notation:
+/*@ requires A valid DatabaseManager instance (db_manager != null) to execute database queries &&
+  @ session['email'] != null (i.e., user is logged in);
+  @ ensures Provides accurate user analytics in the form of a dictionary:
+  @   - 'quizzes_taken' == COUNT(*) quizzes attempted by the user;
+  @   - 'questions_answered' == SUM(questions_answered) by the user;
+  @   - 'avg_score' == SUM(score) / SUM(questions_answered) * 100 (percentage, rounded to 2 decimals);
+@*/
 """
 class DataAnalyticsManager:
+
     """
-    The DataAnalyticsManager class is responsible for calculating user analytics, such as
-    the number of quizzes taken, total questions answered, and average score for each user.
-    It interacts with the database through DatabaseManager to retrieve and compute statistics.
-    
-    @requires A valid DatabaseManager instance for querying the database
-    @ensures Accurate statistics are retrieved and calculated for each user
+    Description:
+    Initializes the DataAnalyticsManager instance with a DatabaseManager object. This allows the class to perform 
+    database operations required to compute user analytics.
+
+    Semi-formal Notation:
+    /*@ requires db_manager != null (valid instance of DatabaseManager);
+      @ ensures self.db_manager == db_manager;
+    @*/
     """
     def __init__(self, db_manager):
         self.db_manager = db_manager
 
     """
-    Retrieve analytics data for the current user, including the number of quizzes taken,
-    total questions answered, and average score.
-    @requires The user to be logged in (i.e., their email stored in session)
-    @ensures Returns a dictionary with quiz analytics for the user
+    Description:
+    This method retrieves the analytics data for the currently logged-in user. The method calculates and returns 
+    the total number of quizzes taken, total questions answered, and the user's average score in percentage format, 
+    rounded to two decimal places.
+
+    Semi-formal Notation:
+    /*@ requires session['email'] != null (user is logged in) &&
+    @ db_manager.execute_query is functional and correctly retrieves data;
+    @ ensures \result == null if session['email'] == null &&
+    @ ensures \result == {
+    @   'quizzes_taken': SELECT COUNT(*) FROM user_quiz_stats WHERE user_email = session['email'],
+    @   'questions_answered': SELECT SUM(questions_answered) FROM user_quiz_stats WHERE user_email = session['email'],
+    @   'avg_score': (SUM(score) / SUM(questions_answered)) * 100, rounded to 2 decimal places if SUM(questions_answered) > 0,
+    @   'avg_score': 0.0 if SUM(questions_answered) == 0
+    @ };
+    @*/
     """
     def get_user_analytics(self):
         user_email = session.get('email')
@@ -59,4 +74,3 @@ class DataAnalyticsManager:
             'questions_answered': questions_answered,
             'avg_score': round(avg_score_percentage, 2)  # Rounded to 2 decimal places for percentage display
         }
-

@@ -1,28 +1,53 @@
 from flask import session, request, redirect, url_for, render_template
 
 """
-The QuizSubmissionManager class handles user interactions with quizzes, including submitting answers, tracking scores, and managing penalties.
-@requires A valid DatabaseManager for storing and retrieving quiz data, and a QuizRetrievalManager for fetching quiz questions
-@ensures Quizzes are properly submitted, scored, and penalties are handled for incorrect answers
+Description:
+The QuizSubmissionManager class manages user interactions with quizzes, including navigating through questions, 
+submitting answers, updating scores, and handling penalties for incorrect responses. It integrates with the 
+DatabaseManager for data storage and QuizRetrievalManager for fetching quiz details.
+
+Semi-formal Notation:
+/*@ requires db_manager != null (valid DatabaseManager instance) &&
+  @ retrieval_manager != null (valid QuizRetrievalManager instance);
+  @ ensures QuizSubmissionManager facilitates:
+  @   - Navigating quiz questions via take_quiz;
+  @   - Submitting and validating answers via submit_quiz_answer;
+  @   - Rendering scores and penalties via score and penalty methods;
+@*/
 """
 class QuizSubmissionManager:
+
     """
-    Initialize the QuizSubmissionManager with a database and retrieval manager
-    db_manager: DatabaseManager - The manager responsible for database operations
-    retrieval_manager: QuizRetrievalManager - The manager responsible for quiz fetching
-    @requires A valid DatabaseManager and QuizRetrievalManager instance
-    @ensures QuizSubmissionManager is ready to handle quiz submissions and answer evaluations
+    Description:
+    Initializes the QuizSubmissionManager with a DatabaseManager for handling database operations and a 
+    QuizRetrievalManager for accessing quiz details.
+
+    Semi-formal Notation:
+    /*@ requires db_manager != null (valid DatabaseManager instance) &&
+    @ retrieval_manager != null (valid QuizRetrievalManager instance);
+    @ ensures self.db_manager == db_manager &&
+    @ ensures self.retrieval_manager == retrieval_manager;
+    @*/
     """
     def __init__(self, db_manager, retrieval_manager):
         self.db_manager = db_manager
         self.retrieval_manager = retrieval_manager
 
     """
-    Render the quiz question page for the given quiz and question number
-    quiz_id: int - The ID of the quiz
-    question_num: int - The current question number
-    @requires A valid quiz_id and question_num
-    @ensures The current question for the quiz is rendered
+    Description:
+    Renders the quiz question page for the given quiz and question number. Validates the quiz ID and ensures the 
+    user is not navigating beyond the total number of questions.
+
+    Semi-formal Notation:
+    /*@ requires quiz_id > 0 (valid quiz ID) &&
+    @ question_num >= 0;
+    @ ensures If quiz exists:
+    @   Renders 'take-quiz.html' with quiz details and the current question;
+    @ ensures If quiz does not exist:
+    @   \result == ("Quiz not found", 404);
+    @ ensures If question_num >= len(quiz['questions']):
+    @   Redirects to home;
+    @*/
     """
     def take_quiz(self, quiz_id, question_num):
         quiz = self.retrieval_manager.get_quiz_by_id(quiz_id)
@@ -35,11 +60,23 @@ class QuizSubmissionManager:
         return render_template('take-quiz.html', quiz=quiz, question_num=question_num, quiz_id=quiz_id)
 
     """
-    Process the answer submitted by the user for the given question
-    quiz_id: int - The ID of the quiz
-    question_num: int - The current question number
-    @requires A valid quiz_id, question_num, and answer submitted by the user
-    @ensures The answer is checked and the next question or score is displayed
+    Description:
+    Processes the user's answer for the current question, validates it against the correct answer, and navigates 
+    to the next question or the score page. Updates the play count in the database upon completion.
+
+    Semi-formal Notation:
+    /*@ requires quiz_id > 0 (valid quiz ID) &&
+    @ question_num >= 0 &&
+    @ request.form['answer'] contains the user's submitted answer;
+    @ ensures If answer is correct:
+    @   session['current_score'] is incremented &&
+    @   Redirects to the next question if question_num + 1 < len(quiz['questions']);
+    @ ensures If all questions are answered:
+    @   Updates the play count for creator or user &&
+    @   Redirects to score page with final score;
+    @ ensures If answer is incorrect:
+    @   Redirects to penalty page for the current question;
+    @*/
     """
     def submit_quiz_answer(self, quiz_id, question_num):
         quiz = self.retrieval_manager.get_quiz_by_id(quiz_id)
@@ -70,12 +107,19 @@ class QuizSubmissionManager:
             return redirect(url_for('penalty_route', quiz_id=quiz_id, question_num=question_num))
 
     """
-    Render the score page after the quiz is completed
-    quiz_id: int - The ID of the quiz
-    score: int - The score achieved by the user
-    total: int - The total number of questions
-    @requires A valid quiz_id, score, and total
-    @ensures The score page is rendered showing the final result
+    Description:
+    Renders the score page showing the user's performance after completing the quiz. Updates user statistics in the 
+    database, including total questions answered and score.
+
+    Semi-formal Notation:
+    /*@ requires quiz_id > 0 (valid quiz ID) &&
+    @ score >= 0 &&
+    @ total > 0;
+    @ ensures If user_email exists in session:
+    @   Updates or inserts user statistics in the `user_quiz_stats` table;
+    @ ensures session['current_score'] is cleared &&
+    @ ensures Renders 'score.html' with final score and total questions;
+    @*/
     """
     def score(self, quiz_id, score, total):
         user_email = session.get('email')
@@ -93,11 +137,18 @@ class QuizSubmissionManager:
         return render_template('score.html', score=score, total=total)
 
     """
-    Render the penalty page for an incorrect answer
-    quiz_id: int - The ID of the quiz
-    question_num: int - The current question number
-    @requires A valid quiz_id and question_num
-    @ensures The penalty page is rendered showing the incorrect answer
+    Description:
+    Renders the penalty page when the user submits an incorrect answer. Displays the current score and the total 
+    number of questions in the quiz.
+
+    Semi-formal Notation:
+    /*@ requires quiz_id > 0 (valid quiz ID) &&
+    @ question_num >= 0;
+    @ ensures If quiz exists:
+    @   Renders 'penalty.html' with quiz_id, question_num, total_questions, and current score;
+    @ ensures If quiz does not exist:
+    @   \result == ("Quiz not found", 404);
+    @*/
     """
     def penalty(self, quiz_id, question_num):
         quiz = self.retrieval_manager.get_quiz_by_id(quiz_id)

@@ -1,24 +1,50 @@
 from flask import request, render_template, redirect, url_for, session, flash
 
 """
-The QuizCreationManager class handles the quiz creation process including rendering forms, handling submissions, and storing quizzes in the database.
-@requires A valid DatabaseManager for executing SQL queries
-@ensures Quizzes are created, validated, and stored with proper user restrictions
+Description:
+The QuizCreationManager class manages the process of quiz creation, including rendering forms, handling submissions, 
+and storing quizzes in the database. It ensures user-defined quizzes adhere to platform restrictions, such as the 
+maximum number of questions and quizzes allowed per user.
+
+Semi-formal Notation:
+/*@ requires A valid DatabaseManager instance to handle database operations &&
+  @ session['email'] != null (user must be logged in);
+  @ ensures Quizzes are created, validated, and stored with user restrictions enforced:
+  @   - A user can create a maximum of 3 quizzes;
+  @   - Each quiz can have up to 10 questions;
+  @   - Quiz data is stored in the database correctly with associated user information;
+@*/
 """
 class QuizCreationManager:
+
     """
-    Initialize the QuizCreationManager with a database manager
-    db_manager: DatabaseManager - The manager responsible for database operations
-    @requires A valid DatabaseManager instance
-    @ensures QuizCreationManager is ready to handle quiz creation and submission
+    Description:
+    Initializes the QuizCreationManager instance with a DatabaseManager for executing SQL queries. This ensures 
+    the manager is ready to handle quiz creation and submission tasks.
+
+    Semi-formal Notation:
+    /*@ requires db_manager != null (a valid instance of DatabaseManager);
+    @ ensures self.db_manager == db_manager &&
+    @ QuizCreationManager is prepared to execute database operations;
+    @*/
     """
     def __init__(self, db_manager):
         self.db_manager = db_manager
 
     """
-    Handle the quiz creation process and render the form for quiz creation
-    @requires A POST request with valid form data (title, num_questions) or a GET request to render the form
-    @ensures Quiz creation form is rendered or a new quiz form is displayed with dynamic fields
+    Description:
+    Handles the quiz creation process, rendering the form for quiz creation or dynamically displaying fields for 
+    questions based on user input. Validates restrictions such as the maximum number of quizzes per user.
+
+    Semi-formal Notation:
+    /*@ requires request.method == 'POST' ? (request.form contains 'num_questions' && 'title') : True &&
+    @ session['email'] != null;
+    @ ensures If POST:
+    @   - Flash error message and redirect if user has >= 3 quizzes;
+    @   - Render a quiz creation form with dynamic fields for up to 10 questions;
+    @ ensures If GET:
+    @   - Render the initial quiz creation form (create-quiz.html);
+    @*/
     """
     def create_quiz(self):
         if request.method == 'POST':
@@ -36,9 +62,18 @@ class QuizCreationManager:
         return render_template('create-quiz.html')
 
     """
-    Handle the submission of the created quiz and store it in the database
-    @requires A POST request with the filled quiz form data
-    @ensures The quiz data is inserted into the database
+    Description:
+    Handles the submission of a user-created quiz. Extracts data from the request, builds the necessary SQL query, 
+    and stores the quiz in the database.
+
+    Semi-formal Notation:
+    /*@ requires request.method == 'POST' &&
+    @ request.form contains 'title' &&
+    @ request.form contains dynamically generated questions and options;
+    @ ensures Quiz data is inserted into the database with:
+    @   - User email associated with the quiz;
+    @   - Up to 10 valid questions with their options and correct answers;
+    @*/
     """
     def submit_quiz(self):
         if request.method == 'POST':
@@ -53,10 +88,16 @@ class QuizCreationManager:
             return redirect(url_for('home'))
 
     """
-    Check if the user has reached the maximum number of quizzes allowed
-    user_email: str - The email of the user creating the quiz
-    @requires A valid user_email and database connection
-    @ensures Returns True if the user has reached the limit of 3 quizzes, else False
+    Description:
+    Checks whether the user has reached the maximum number of quizzes allowed (3). Executes a query to count the 
+    quizzes associated with the user’s email.
+
+    Semi-formal Notation:
+    /*@ requires user_email != null &&
+    @ user_email is a valid string &&
+    @ db_manager.execute_query(query, (user_email,)) returns a single-row result;
+    @ ensures \result == (COUNT(quizzes WHERE user_email == session['email']) >= 3);
+    @*/
     """
     def has_reached_quiz_limit(self, user_email):
         query = "SELECT COUNT(*) FROM quizzes WHERE user_email = %s"
@@ -64,9 +105,14 @@ class QuizCreationManager:
         return result[0][0] >= 3
 
     """
-    Get the quiz details (number of questions and title) from the form
-    @requires The request form to contain 'num_questions' and 'title' fields
-    @ensures Returns the number of questions and quiz title from the form
+    Description:
+    Extracts the quiz title, number of questions, and optional audio file from the submitted form. Processes and 
+    validates the audio file format.
+
+    Semi-formal Notation:
+    /*@ requires request.form contains 'title', 'num_questions', and optionally 'audio_file' &&
+    @ ensures \result == (request.form['num_questions'], request.form['title'], formatted_audio_file);
+    @*/
     """
     def get_quiz_details_from_form(self):
         num_questions = request.form.get('num_questions')
@@ -78,29 +124,45 @@ class QuizCreationManager:
         return num_questions, title, audio_file
 
     """
-    Limit the number of questions to a maximum of 10
-    num_questions: int - The number of questions input by the user
-    @requires num_questions to be a valid integer
-    @ensures Returns the limited number of questions, capped at 10
+    Description:
+    Limits the number of questions to a maximum of 10. Ensures the input is a valid integer before applying the limit.
+
+    Semi-formal Notation:
+    /*@ requires num_questions is a valid integer;
+    @ ensures \result == min(num_questions, 10);
+    @*/
     """
     def limit_questions(self, num_questions):
         num_questions = int(num_questions)
         return min(num_questions, 10)
 
     """
-    Render the form for quiz creation with the specified number of questions and title
-    num_questions: int - The number of questions to create
-    title: str - The title of the quiz
-    @requires num_questions to be an integer and title to be a valid string
-    @ensures Renders the form for creating the quiz with dynamically generated question fields
+    Description:
+    Renders the quiz creation form with the specified number of questions and title. Dynamically generates fields 
+    based on the number of questions requested by the user.
+
+    Semi-formal Notation:
+    /*@ requires num_questions is an integer &&
+    @ title is a valid non-empty string;
+    @ ensures Renders create-quiz.html with dynamically generated fields:
+    @   - num_questions question fields;
+    @   - Audio file field set to audio_file;
+    @*/
     """
     def render_quiz_creation_form(self, num_questions, title, audio_file):
         return render_template('create-quiz.html', num_questions=num_questions, title=title, audio_file=audio_file)
 
     """
-    Build the questions list from the form data
-    @requires The request form to contain the dynamically generated questions and options
-    @ensures Returns a list of questions with their respective options and correct answers
+    Description:
+    Builds a list of questions from the submitted form. Each question includes text, four options, and the correct 
+    answer. Skips invalid or incomplete questions.
+
+    Semi-formal Notation:
+    /*@ requires request.form contains dynamically generated question fields:
+    @   \forall i \in [0, num_questions-1] (request.form contains:
+    @     f'question_text_{i}', f'answer_{i}_1', f'answer_{i}_2', f'answer_{i}_3', f'answer_{i}_4', f'correct_answer_{i}');
+    @ ensures \result == [(q_text, opt1, opt2, opt3, opt4, correct) for valid questions];
+    @*/
     """
     def build_questions_from_form(self):
         questions = []
@@ -127,12 +189,20 @@ class QuizCreationManager:
 
 
     """
-    Build the SQL query to insert the quiz into the database
-    questions: list - The list of questions with their options and correct answers
-    user_email: str - The email of the user creating the quiz
-    title: str - The title of the quiz
-    @requires A valid list of questions, user_email, and title
-    @ensures Returns the columns, values, and query placeholders for the SQL insert statement
+    Description:
+    Constructs the SQL query for inserting the quiz and its questions into the database. Dynamically generates 
+    columns, values, and placeholders for up to 10 questions.
+
+    Semi-formal Notation:
+    /*@ requires \forall question \in questions:
+    @   len(question) == 6 &&
+    @   question[0] is non-empty string (question text) &&
+    @   question[1..4] are non-empty strings (options) &&
+    @   question[5] is one of the options (correct answer);
+    @ ensures columns == ['user_email', 'title', 'audio_file', ...dynamic question columns...] &&
+    @ ensures placeholders == '%s, %s, %s, ...' &&
+    @ ensures values == [user_email, title, audio_file, ...flattened question values...];
+    @*/
     """
     def build_insert_query(self, questions, user_email, title, audio_file):
         columns = ['user_email', 'title', 'audio_file']
@@ -152,12 +222,16 @@ class QuizCreationManager:
 
 
     """
-    Store the created quiz in the database
-    columns: list - The list of column names for the SQL insert statement
-    values: list - The values to be inserted into the columns
-    placeholders: str - The placeholders for the SQL insert query
-    @requires Valid columns, values, and placeholders
-    @ensures The quiz is inserted into the quizzes table in the database
+    Description:
+    Executes an SQL query to insert the quiz and its associated data into the `quizzes` table. Commits the transaction 
+    to save the data permanently.
+
+    Semi-formal Notation:
+    /*@ requires columns is a non-empty list of valid SQL column names &&
+    @ values is a list of corresponding data for the columns &&
+    @ placeholders is a correctly formatted string matching len(columns);
+    @ ensures Quiz is inserted into the `quizzes` table with all fields populated;
+    @*/
     """
     def store_quiz_in_database(self, columns, values, placeholders):
         insert_quiz_query = f"INSERT INTO quizzes ({', '.join(columns)}) VALUES ({placeholders})"
