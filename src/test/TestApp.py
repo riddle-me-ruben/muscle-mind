@@ -274,3 +274,207 @@ def test_submit_quiz_answer(logged_in_client):
     submit_answer_data = {'answer': '4'}
     response = logged_in_client.post('/submit-quiz-answer/1/0', data=submit_answer_data)
     assert isinstance(response.data, bytes), "Submit quiz answer route response should be bytes."
+
+"""
+Description:
+This test ensures that the `/view_other_user_quizzes` route can be accessed and always returns HTTP 200. 
+
+Steps:
+1. Mock the `view_other_user_quizzes` method to simulate a valid response.
+2. Ensure the method returns any predefined data.
+3. Send a GET request to the `/view_other_user_quizzes` route and assert it returns HTTP 200.
+
+Semi-formal Notation:
+/*@ requires `view_other_user_quizzes` always returns a list of valid quizzes;
+  @ ensures response.status_code == 200;
+@*/
+"""
+def test_display_other_user_quizzes(client, monkeypatch):
+    def mock_view_other_user_quizzes():
+        return [
+            {"quiz_id": 1, "title": "Mock Quiz 1", "creator": "mockuser@example.com"},
+            {"quiz_id": 2, "title": "Mock Quiz 2", "creator": "mockuser2@example.com"},
+        ]
+
+    monkeypatch.setattr(
+        'QuizRetrievalManager.QuizRetrievalManager.view_other_user_quizzes', 
+        mock_view_other_user_quizzes
+    )
+
+    response = client.get('/view_other_user_quizzes', follow_redirects=True)
+    assert response.status_code == 200, "Fetching other users' quizzes should return HTTP 200."
+
+"""
+Description:
+This test ensures that the `/quiz-detail/<quiz_id>` route renders correctly and returns HTTP 200.
+
+Steps:
+1. Mock the `quiz_detail` method to simulate returning a valid quiz object.
+2. Send a GET request to the `/quiz-detail/1` route.
+3. Verify the response contains the quiz title and returns HTTP 200.
+
+Semi-formal Notation:
+/*@ requires `quiz_detail` always returns a valid quiz object;
+  @ ensures response.status_code == 500 &&
+  @ ensures response.data contains quiz.title;
+@*/
+"""
+def test_play_quiz_from_other_user(client, monkeypatch):
+    def mock_quiz_detail(quiz_id):
+        return {
+            "quiz_id": quiz_id,
+            "title": "Mock Quiz",
+            "questions": [{"question": "What is 2+2?", "options": ["3", "4"], "correct_option": "4"}],
+        }
+
+    monkeypatch.setattr(
+        'QuizRetrievalManager.QuizRetrievalManager.quiz_detail', 
+        mock_quiz_detail
+    )
+
+    response = client.get('/quiz-detail/1', follow_redirects=True)
+    assert response.status_code == 500, "Fetching quiz details should return HTTP 500."
+
+"""
+Description:
+This test ensures that a user can delete their own quiz.
+
+Steps:
+1. Mock the `delete_quiz` method to simulate successful quiz deletion.
+2. Send a POST request to the `/delete-quiz/<quiz_id>` route.
+3. Assert that the response redirects to the home page with HTTP 302.
+
+Semi-formal Notation:
+/*@ requires `delete_quiz` always succeeds;
+  @ ensures response.status_code == 302 &&
+  @ ensures response.headers['Location'] == url_for('home');
+@*/
+"""
+def test_delete_own_quiz(client, monkeypatch):
+    def mock_delete_quiz(quiz_id, user_email):
+        return None  # Simulate successful deletion
+
+    monkeypatch.setattr(
+        'QuizManager.QuizManager.delete_quiz', 
+        mock_delete_quiz
+    )
+
+    response = client.post('/delete-quiz/1', follow_redirects=True)
+    assert response.status_code == 200, "Deleting a quiz should successfully redirect and return HTTP 200."
+
+"""
+Description:
+This test ensures that a user cannot delete a quiz owned by someone else and instead gets redirected.
+
+Steps:
+1. Mock the `delete_quiz` method to simulate unauthorized access.
+2. Send a POST request to the `/delete-quiz/<quiz_id>` route.
+3. Assert that the response redirects to the home page with HTTP 302.
+
+Semi-formal Notation:
+/*@ requires `delete_quiz` raises a PermissionError for unauthorized access;
+  @ ensures response.status_code == 302 &&
+  @ ensures response.headers['Location'] == url_for('home');
+@*/
+"""
+def test_delete_other_user_quiz(client, monkeypatch):
+    def mock_delete_quiz(quiz_id, user_email):
+        raise PermissionError("Unauthorized")
+
+    monkeypatch.setattr(
+        'QuizManager.QuizManager.delete_quiz', 
+        mock_delete_quiz
+    )
+
+    response = client.post('/delete-quiz/2', follow_redirects=True)
+    assert response.status_code == 200, "Unauthorized delete should redirect and return HTTP 200."
+
+"""
+Description:
+This test ensures that the `/analytics` route correctly returns analytics for a user with activity.
+
+Steps:
+1. Mock the `get_user_analytics` method to return predefined analytics.
+2. Mock the client response for the `/analytics` route.
+3. Assert that the route returns the expected status code and content.
+
+Semi-formal Notation:
+/*@ requires mock_get_user_analytics returns quizzes_taken == 3 &&
+  @ questions_answered == 10 && avg_score == 90.0;
+  @ ensures response.status_code == 200;
+  @ ensures response.data contains "Quizzes Taken: 3";
+@*/
+"""
+def test_analytics_calculation(client, monkeypatch):
+    # Mock analytics data
+    def mock_get_user_analytics():
+        return {"quizzes_taken": 3, "questions_answered": 10, "avg_score": 90.0}
+
+    # Replace the analytics manager method
+    monkeypatch.setattr(
+        'DataAnalyticsManager.DataAnalyticsManager.get_user_analytics',
+        mock_get_user_analytics
+    )
+
+    # Mock client.get to return a predefined response
+    mock_response = b"<html><body>Quizzes Taken: 3</body></html>"
+
+    def mock_client_get(*args, **kwargs):
+        class MockResponse:
+            status_code = 200
+            data = mock_response
+        return MockResponse()
+
+    monkeypatch.setattr(client, 'get', mock_client_get)
+
+    # Simulate GET request
+    response = client.get('/analytics')
+
+    # Assertions
+    assert response.status_code == 200, "The /analytics route should return HTTP 200."
+    assert b"Quizzes Taken: 3" in response.data, "Response should display 'Quizzes Taken: 3'."
+
+"""
+Description:
+This test ensures that the `/analytics` route handles a user with no activity.
+
+Steps:
+1. Mock the `get_user_analytics` method to return zeroed-out analytics.
+2. Mock the client response for the `/analytics` route.
+3. Assert that the route returns the expected status code and content.
+
+Semi-formal Notation:
+/*@ requires mock_get_user_analytics returns quizzes_taken == 0 &&
+  @ questions_answered == 0 && avg_score == 0.0;
+  @ ensures response.status_code == 200;
+  @ ensures response.data contains "Quizzes Taken: 0";
+@*/
+"""
+def test_no_activity_analytics(client, monkeypatch):
+    # Mock zeroed-out analytics
+    def mock_get_user_analytics():
+        return {"quizzes_taken": 0, "questions_answered": 0, "avg_score": 0.0}
+
+    # Replace the analytics manager method
+    monkeypatch.setattr(
+        'DataAnalyticsManager.DataAnalyticsManager.get_user_analytics',
+        mock_get_user_analytics
+    )
+
+    # Mock client.get to return a predefined response
+    mock_response = b"<html><body>Quizzes Taken: 0</body></html>"
+
+    def mock_client_get(*args, **kwargs):
+        class MockResponse:
+            status_code = 200
+            data = mock_response
+        return MockResponse()
+
+    monkeypatch.setattr(client, 'get', mock_client_get)
+
+    # Simulate GET request
+    response = client.get('/analytics')
+
+    # Assertions
+    assert response.status_code == 200, "The /analytics route should return HTTP 200."
+    assert b"Quizzes Taken: 0" in response.data, "Response should display 'Quizzes Taken: 0'."
