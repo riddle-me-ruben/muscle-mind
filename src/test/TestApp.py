@@ -175,25 +175,6 @@ def test_create_quiz(logged_in_client):
 
 """
 Description:
-The server must be running and able to handle POST requests to the "/submit-quiz" route. The session must 
-contain a valid email, and the request must include a non-empty list of answers. The test ensures the answers 
-are submitted and stored successfully.
-
-Semi-formal Notation:
-/*@ requires The server is running &&
-  @ session["email"] matches the format ("a <= email[i] <= z || A <= email[i] <= Z" + "@" + domain.com) &&
-  @ answers is a non-empty list (answers != None && len(answers) > 0);
-  @ ensures The answers are stored in the database &&
-  @ response.data is of type bytes;
-@*/
-"""
-def test_submit_quiz(logged_in_client):
-    data = {'answers': ['A', 'B', 'C']}
-    response = logged_in_client.post('/submit-quiz', data=data)
-    assert isinstance(response.data, bytes), "Submit quiz route response should be bytes."
-
-"""
-Description:
 The server must be active, and the request must include a valid quiz ID (a positive integer greater than 0). 
 The test ensures that the quiz details corresponding to the given ID are retrieved and returned.
 
@@ -274,6 +255,25 @@ def test_submit_quiz_answer(logged_in_client):
     submit_answer_data = {'answer': '4'}
     response = logged_in_client.post('/submit-quiz-answer/1/0', data=submit_answer_data)
     assert isinstance(response.data, bytes), "Submit quiz answer route response should be bytes."
+
+"""
+Description:
+The server must be running and able to handle POST requests to the "/submit-quiz" route. The session must 
+contain a valid email, and the request must include a non-empty list of answers. The test ensures the answers 
+are submitted and stored successfully.
+
+Semi-formal Notation:
+/*@ requires The server is running &&
+  @ session["email"] matches the format ("a <= email[i] <= z || A <= email[i] <= Z" + "@" + domain.com) &&
+  @ answers is a non-empty list (answers != None && len(answers) > 0);
+  @ ensures The answers are stored in the database &&
+  @ response.data is of type bytes;
+@*/
+"""
+def test_submit_quiz(logged_in_client):
+    data = {'answers': ['A', 'B', 'C']}
+    response = logged_in_client.post('/submit-quiz', data=data)
+    assert isinstance(response.data, bytes), "Submit quiz route response should be bytes."
 
 """
 Description:
