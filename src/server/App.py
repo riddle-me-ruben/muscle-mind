@@ -1,9 +1,5 @@
 from flask import Flask, render_template, redirect, url_for, session
-from DatabaseManager import DatabaseManager
-from QuizManager import QuizManager
-from UserManager import UserManager
-from DataAnalyticsManager import DataAnalyticsManager
-from QuizRetrievalManager import QuizRetrievalManager
+from ManagerFactory import ManagerFactory
 from dotenv import load_dotenv
 import os
 
@@ -40,12 +36,15 @@ class App:
         self.app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), '../../static'), template_folder='../client')
         self.app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
         
-        # Initialize managers
-        self.db_manager = DatabaseManager(self.app)
-        self.quiz_manager = QuizManager(self.db_manager)
-        self.user_manager = UserManager(self.db_manager, session)
-        self.analytics_manager = DataAnalyticsManager(self.db_manager)
-        self.quiz_retrieval_manager = QuizRetrievalManager(self.db_manager, self.analytics_manager)
+        # Initialize the ManagerFactory
+        self.factory = ManagerFactory(self.app)
+
+        # Use the factory to create managers
+        self.db_manager = self.factory.get_manager("DatabaseManager")
+        self.quiz_manager = self.factory.get_manager("QuizManager")
+        self.user_manager = self.factory.get_manager("UserManager")
+        self.analytics_manager = self.factory.get_manager("DataAnalyticsManager")
+        self.quiz_retrieval_manager = self.factory.get_manager("QuizRetrievalManager")
 
         # Set up routes
         self.initialize_routes()

@@ -1,6 +1,3 @@
-from QuizCreationManager import QuizCreationManager
-from QuizRetrievalManager import QuizRetrievalManager
-from QuizSubmissionManager import QuizSubmissionManager
 from flask import redirect, url_for, flash, session
 
 """
@@ -32,11 +29,10 @@ class QuizManager:
     @ ensures self.quiz_creation, self.quiz_retrieval, self.quiz_submission are instantiated and ready for use;
     @*/
     """
-    def __init__(self, db_manager):
-        self.quiz_creation = QuizCreationManager(db_manager)
-        self.quiz_retrieval = QuizRetrievalManager(db_manager, None)
-        self.quiz_submission = QuizSubmissionManager(db_manager, self.quiz_retrieval)
-
+    def __init__(self, factory):
+        self.quiz_creation = factory.get_manager("QuizCreationManager")
+        self.quiz_retrieval = factory.get_manager("QuizRetrievalManager")
+        self.quiz_submission = factory.get_manager("QuizSubmissionManager")
 
     """
     Description:
