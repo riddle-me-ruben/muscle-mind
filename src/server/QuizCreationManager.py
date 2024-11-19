@@ -30,6 +30,8 @@ class QuizCreationManager:
     """
     def __init__(self, db_manager):
         self.db_manager = db_manager
+        self.MAX_QUIZZES_PER_USER = 3
+        self.MAX_QUESTIONS_PER_QUIZ = 10
 
     """
     Description:
@@ -50,7 +52,7 @@ class QuizCreationManager:
         if request.method == 'POST':
             user_email = session['email']
             if self.has_reached_quiz_limit(user_email):
-                flash("You have reached the maximum number of quizzes allowed (3).", "error")
+                flash(f"You have reached the maximum number of quizzes allowed ({self.MAX_QUIZZES_PER_USER}).", "error")
                 return redirect(url_for('create_quiz_route'))
 
             num_questions, title, audio_file = self.get_quiz_details_from_form()
@@ -102,7 +104,7 @@ class QuizCreationManager:
     def has_reached_quiz_limit(self, user_email):
         query = "SELECT COUNT(*) FROM quizzes WHERE user_email = %s"
         result = self.db_manager.execute_query(query, (user_email,))
-        return result[0][0] >= 3
+        return result[0][0] >= self.MAX_QUIZZES_PER_USER
 
     """
     Description:
@@ -134,7 +136,7 @@ class QuizCreationManager:
     """
     def limit_questions(self, num_questions):
         num_questions = int(num_questions)
-        return min(num_questions, 10)
+        return min(num_questions, self.MAX_QUESTIONS_PER_QUIZ)
 
     """
     Description:
