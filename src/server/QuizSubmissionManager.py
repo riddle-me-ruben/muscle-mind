@@ -84,27 +84,46 @@ class QuizSubmissionManager:
         if quiz is None:
             return "Quiz not found", 404
 
-        user_answer = request.form.get('answer')
-        correct_answer = quiz['questions'][question_num]['correct_option']
-        current_score = session.get('current_score', 0)
+        user_answer, correct_answer, current_score = request.form.get('answer'), quiz['questions'][question_num]['correct_option'], session.get('current_score', 0)
 
-        if user_answer == correct_answer:
-            session['current_score'] = current_score + 1
-            if question_num + 1 < len(quiz['questions']):
-                return redirect(url_for('take_quiz_route', quiz_id=quiz_id, question_num=question_num + 1))
-            else:
-                # Increment play count after the last question is answered
-                user_email = session.get('email')
-                if user_email == quiz['creator_email']:
-                    update_query = "UPDATE quizzes SET creator_play_count = creator_play_count + 1 WHERE quiz_id = %s"
-                else:
-                    update_query = "UPDATE quizzes SET user_play_count = user_play_count + 1 WHERE quiz_id = %s"
+        # Increment play count regardless of the correctness of the last question
+        if question_num + 1 == len(quiz['questions']):
+            user_email = session.get('email')
+            creator_email = quiz['creator_email']
+            self.increment_play_count(user_email, creator_email, quiz_id)
 
-                # Update the play count in the database
-                self.db_manager.execute_commit(update_query, (quiz_id,))
-                return redirect(url_for('score_route', quiz_id=quiz_id, score=session['current_score'], total=len(quiz['questions'])))
-        else:
+        if user_answer != correct_answer:
             return redirect(url_for('penalty_route', quiz_id=quiz_id, question_num=question_num))
+
+        session['current_score'] = current_score + 1
+
+        if question_num + 1 < len(quiz['questions']):
+            return redirect(url_for('take_quiz_route', quiz_id=quiz_id, question_num=question_num + 1))
+
+        return redirect(url_for('score_route', quiz_id=quiz_id, score=session['current_score'], total=len(quiz['questions'])))
+
+    """
+    Description:
+    Increments the play count for a quiz. If the user is the creator, increments the creator's play count; 
+    otherwise, increments the user's play count.
+
+    Semi-formal Notation:
+    /*@ requires user_email and creator_email are valid non-null strings &&
+    @ quiz_id > 0 (valid quiz ID);
+    @ ensures If user_email == creator_email:
+    @   Updates creator_play_count in the database;
+    @ ensures If user_email != creator_email:
+    @   Updates user_play_count in the database;
+    @*/
+    """
+    def increment_play_count(self, user_email, creator_email, quiz_id):
+        if user_email == creator_email:
+            update_query = "UPDATE quizzes SET creator_play_count = creator_play_count + 1 WHERE quiz_id = %s"
+        else:
+            update_query = "UPDATE quizzes SET user_play_count = user_play_count + 1 WHERE quiz_id = %s"
+        
+        # Update the play count in the database
+        self.db_manager.execute_commit(update_query, (quiz_id,))
 
     """
     Description:
