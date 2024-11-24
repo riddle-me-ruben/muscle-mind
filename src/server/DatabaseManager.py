@@ -93,13 +93,14 @@ class DatabaseManager:
     @*/
     """
     def connect(self):
-        self.connection = pymysql.connect(
-            host=current_app.config['MYSQL_HOST'],
-            user=current_app.config['MYSQL_USER'],
-            password=current_app.config['MYSQL_PASSWORD'],
-            database=current_app.config['MYSQL_DB'],
-            port=current_app.config['MYSQL_PORT']
-        )
+        if self.connection is None or not self.connection.open:
+            self.connection = pymysql.connect(
+                host=current_app.config['MYSQL_HOST'],
+                user=current_app.config['MYSQL_USER'],
+                password=current_app.config['MYSQL_PASSWORD'],
+                database=current_app.config['MYSQL_DB'],
+                port=current_app.config['MYSQL_PORT']
+            )
 
     """
     Description:
@@ -113,7 +114,7 @@ class DatabaseManager:
     @*/
     """
     def close(self):
-        if self.connection:
+        if self.connection and self.connection.open:
             self.connection.close()
             self.connection = None
 
@@ -131,13 +132,14 @@ class DatabaseManager:
     @*/
     """
     def execute_query(self, query, params=()):
-        self.connect()
-        cursor = self.connection.cursor()
-        cursor.execute(query, params)
-        results = cursor.fetchall()
-        cursor.close()
-        self.close()
-        return results
+        self.connect()  # Ensure connection is valid
+        try:
+            with self.connection.cursor() as cursor:
+                cursor.execute(query, params)
+                results = cursor.fetchall()
+            return results
+        finally:
+            self.close()  # Always close the connection after use
 
     """
     Description:
@@ -157,9 +159,10 @@ class DatabaseManager:
     @*/
     """
     def execute_commit(self, query, params=()):
-        self.connect()
-        cursor = self.connection.cursor()
-        cursor.execute(query, params)
-        self.connection.commit()
-        cursor.close()
-        self.close()
+        self.connect()  # Ensure connection is valid
+        try:
+            with self.connection.cursor() as cursor:
+                cursor.execute(query, params)
+                self.connection.commit()
+        finally:
+            self.close()  # Always close the connection after use
