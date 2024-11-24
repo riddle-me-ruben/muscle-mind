@@ -72,8 +72,8 @@
                 <span class="quiz-title">{{ quiz.title }}</span>
 
                 <div class="quiz-play-stats">
-                    <p>🎮 Played by creator: {{ 0 }}</p>
-                    <p>👥 Played by others: {{ 0 }}</p>
+                    <p>🎮 Played by creator: {{ quiz.creator_play_count or 0 }}</p>
+                    <p>👥 Played by others: {{ quiz.user_play_count or 0 }}</p>
                 </div>
 
                 <div class="button-group">
