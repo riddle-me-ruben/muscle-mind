@@ -93,7 +93,7 @@ class DatabaseManager:
     @*/
     """
     def connect(self):
-        self.connection = pymysql.connect(
+        return pymysql.connect(
             host=current_app.config['MYSQL_HOST'],
             user=current_app.config['MYSQL_USER'],
             password=current_app.config['MYSQL_PASSWORD'],
@@ -113,7 +113,7 @@ class DatabaseManager:
     @*/
     """
     def close(self):
-        if self.connection:
+        if self.connection and self.connection.open:
             self.connection.close()
             self.connection = None
 
@@ -131,13 +131,13 @@ class DatabaseManager:
     @*/
     """
     def execute_query(self, query, params=()):
-        self.connect()
-        cursor = self.connection.cursor()
-        cursor.execute(query, params)
-        results = cursor.fetchall()
-        cursor.close()
-        self.close()
-        return results
+        connection = self.connect()  # Ensure connection is valid
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query, params)
+                return cursor.fetchall()
+        finally:
+            connection.close()  # Always close the connection after use
 
     """
     Description:
@@ -157,9 +157,10 @@ class DatabaseManager:
     @*/
     """
     def execute_commit(self, query, params=()):
-        self.connect()
-        cursor = self.connection.cursor()
-        cursor.execute(query, params)
-        self.connection.commit()
-        cursor.close()
-        self.close()
+        connection = self.connect()  # Ensure connection is valid
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query, params)
+                connection.commit()
+        finally:
+            connection.close()  # Always close the connection after use
